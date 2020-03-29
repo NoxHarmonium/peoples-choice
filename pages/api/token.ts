@@ -6,7 +6,7 @@ import { serialize } from "cookie";
 
 import jwt from "jsonwebtoken";
 
-export default (req: NowRequest, res: NowResponse) => {
+export default async (req: NowRequest, res: NowResponse) => {
   if (req.query.error) {
     // The user did not give us permission.
     console.error(req.query.error);
@@ -21,18 +21,17 @@ export default (req: NowRequest, res: NowResponse) => {
       });
     }
 
-    oAuthClient.getToken(req.query.code, function(error, token) {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({});
-      }
-
+    try {
+      const { tokens } = await oAuthClient.getToken(req.query.code);
       res.setHeader("Location", "/");
       res.setHeader(
         "Set-Cookie",
-        serialize("jwt", jwt.sign(token, env.JWT_SECRET))
+        serialize("jwt", jwt.sign(tokens, env.JWT_SECRET))
       );
       return res.status(302).json({});
-    });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({});
+    }
   }
 };

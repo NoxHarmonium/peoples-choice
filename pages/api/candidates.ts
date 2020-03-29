@@ -5,7 +5,7 @@ import { env } from "../../utils/env";
 import { Credentials } from "google-auth-library/build/src/auth/credentials";
 import { google } from "googleapis";
 
-export default (req: NowRequest, res: NowResponse) => {
+export default async (req: NowRequest, res: NowResponse) => {
   if (!req.cookies.jwt) {
     return res.status(401).json({ error: "Unauthorized" });
   }
@@ -19,21 +19,28 @@ export default (req: NowRequest, res: NowResponse) => {
     version: "directory_v1"
   });
 
-  const users = directoryApi.users.list({
-    auth: oAuthClient,
-    domain: "agiledigital.com.au",
-    maxResults: 500,
-    viewType: "domain_public"
-  });
+  const excludedEmails = env.EXCLUDED_EMAILS.split(",");
 
-  return users
-    .then(users =>
-      res.json({
-        candidates: users.data.users
-      })
-    )
-    .catch(error => {
-      console.error(error);
-      res.status(500).json({});
+  try {
+    const {
+      data: { users }
+    } = await directoryApi.users.list({
+      auth: oAuthClient,
+      domain: env.DIRECTORY_DOMAIN,
+      maxResults: 500,
+      viewType: "domain_public"
     });
+    res.json({
+      candidates: users
+        .map(({ primaryEmail, thumbnailPhotoUrl, name }) => ({
+          primaryEmail,
+          thumbnailPhotoUrl,
+          name
+        }))
+        .filter(user => !excludedEmails.includes(user.primaryEmail))
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({});
+  }
 };

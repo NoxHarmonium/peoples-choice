@@ -5,7 +5,7 @@ import { oAuthClient } from "../../utils/oauth-client";
 export default (_: NowRequest, res: NowResponse) => {
   const loginLink = oAuthClient.generateAuthUrl({
     access_type: "offline",
-    scope: "https://www.googleapis.com/auth/admin.directory.user.readonly"
+    scope: "https://www.googleapis.com/auth/admin.directory.user.readonly email"
   });
 
   res.setHeader("Location", loginLink);
