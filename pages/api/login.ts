@@ -1,13 +1,19 @@
-import { NowRequest, NowResponse } from "@now/node";
-import fetch from "isomorphic-unfetch";
 import { oAuthClient } from "../../utils/oauth-client";
+import { apiHandler } from "../../utils/handler";
 
-export default (_: NowRequest, res: NowResponse) => {
+/**
+ * Redirects the browser to the Google OAuth login screen
+ */
+export default apiHandler(async () => {
   const loginLink = oAuthClient.generateAuthUrl({
     access_type: "offline",
     scope: "https://www.googleapis.com/auth/admin.directory.user.readonly email"
   });
 
-  res.setHeader("Location", loginLink);
-  return res.status(302).json({});
-};
+  return {
+    statusCode: 302,
+    headers: {
+      Location: loginLink
+    }
+  };
+});

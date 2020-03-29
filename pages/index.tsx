@@ -1,163 +1,62 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import fetch from "isomorphic-unfetch";
 import { makeStyles } from "@material-ui/core/styles";
-import { admin_directory_v1 } from "googleapis/build/src/apis/admin/directory_v1";
-import {
-  Card,
-  CardActionArea,
-  CardMedia,
-  CardContent,
-  Typography,
-  CardActions,
-  Button,
-  Grid
-} from "@material-ui/core";
+import { Grid, CircularProgress } from "@material-ui/core";
 import { knuthShuffle } from "knuth-shuffle";
-import Reward from "react-rewards";
-import ThumbUpIcon from "@material-ui/icons/ThumbUp";
-
-const useStyles = makeStyles({
-  root: {
-    maxWidth: 345
-  },
-  media: {
-    height: 140,
-    backgroundSize: "contain"
-  },
-  voted: {
-    backgroundColor: "lightblue"
-  }
-});
-
-type Candidate = admin_directory_v1.Schema$User;
-type Candidates = Array<Candidate>;
-type CandidatesResponse = {
-  candidates: Candidates;
-};
-
-type Votes = ReadonlyArray<string>;
-type VotesResponse = {
-  votes: Votes;
-};
+import {
+  Candidates,
+  Votes,
+  CandidatesResponse,
+  VotesResponse
+} from "../utils/types";
+import { CandidateCard } from "../components/candidate-card";
+import { CandidateGrid } from "../components/candidate-grid";
 
 const Home = () => {
+  const [loading, setLoading] = useState(true);
   const [candidates, setCandidates] = useState<Candidates>([]);
   const [votes, setVotes] = useState<Votes>([]);
 
   useEffect(() => {
-    fetch("/api/candidates")
-      .then(resp => {
-        if (!resp.ok) {
-          throw new Error("Network response was not ok");
+    setLoading(true);
+    const loadData = async () => {
+      try {
+        const responses = await Promise.all([
+          fetch("/api/candidates"),
+          fetch("/api/votes")
+        ]);
+
+        const [candidateResponse, votesResponse] = responses;
+
+        if (candidateResponse.status === 401) {
+          console.log("Unauthorized response. Redirecting to login.");
+          window.location.replace("/api/login");
+          return;
         }
-        return resp.json();
-      })
-      .then(json =>
-        setCandidates(knuthShuffle((json as CandidatesResponse).candidates))
-      )
-      .catch(err => console.error(err));
-    fetch("/api/votes")
-      .then(resp => {
-        if (!resp.ok) {
-          throw new Error("Network response was not ok");
+
+        if (!responses.every(r => r.ok)) {
+          throw new Error("One ore more network responses were not ok");
         }
-        return resp.json();
-      })
-      .then(json => setVotes((json as VotesResponse).votes))
-      .catch(err => console.error(err));
+
+        const candidateJson = await candidateResponse.json();
+        const votesJson = await votesResponse.json();
+        setCandidates(
+          knuthShuffle((candidateJson as CandidatesResponse).candidates)
+        );
+        setVotes((votesJson as VotesResponse).votes);
+      } catch (e) {
+        console.error("Error caught while fetching data: ", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
   }, []);
 
-  return (
-    <Grid container spacing={3} alignItems="stretch">
-      {candidates.length > 0 ? (
-        candidates.map((candidate, index) => (
-          <CandidateCard
-            candidate={candidate}
-            key={index}
-            votes={votes}
-            setVotes={setVotes}
-          />
-        ))
-      ) : (
-        <div>
-          <h1>Voting</h1>
-          <a href="/api/login">Login</a>
-        </div>
-      )}
-    </Grid>
-  );
-};
-
-const CandidateCard = ({
-  candidate,
-  votes,
-  setVotes
-}: {
-  candidate: Candidate;
-  votes: Votes;
-  setVotes: (votes: Votes) => void;
-}) => {
-  const classes = useStyles();
-  const [reward, setReward] = useState<undefined | any>(undefined);
-
-  const voteCount = votes.filter(v => v === candidate.primaryEmail).length;
-  const hasBeenVotedFor = voteCount > 0;
-
-  const onVote = useCallback(() => {
-    fetch("/api/votes", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        targetEmail: candidate.primaryEmail
-      })
-    })
-      .then(resp => {
-        if (!resp.ok) {
-          throw new Error("Network response was not ok");
-        }
-        setVotes([...votes, candidate.primaryEmail]);
-
-        if (reward !== undefined) {
-          reward.rewardMe();
-        }
-      })
-      .catch(err => console.error(err));
-  }, [candidate, votes, setVotes, reward]);
-
-  return (
-    <Grid item xs={6} md={2}>
-      <Reward
-        ref={ref => {
-          setReward(ref);
-        }}
-        type="emoji"
-      >
-        <Card className={hasBeenVotedFor ? classes.voted : ""}>
-          <CardActionArea>
-            <CardMedia
-              className={classes.media}
-              image={candidate.thumbnailPhotoUrl}
-              title={`Portrait of ${candidate.name.fullName}`}
-            />
-            <CardContent>
-              <Typography gutterBottom variant="h6">
-                {candidate.name.fullName}
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-          <CardActions>
-            <Button size="small" color="primary" onClick={onVote}>
-              Vote
-            </Button>
-            {Array.from({ length: voteCount }, () => (
-              <ThumbUpIcon />
-            ))}
-          </CardActions>
-        </Card>
-      </Reward>
-    </Grid>
+  return loading ? (
+    <CircularProgress />
+  ) : (
+    <CandidateGrid candidates={candidates} votes={votes} setVotes={setVotes} />
   );
 };
 
