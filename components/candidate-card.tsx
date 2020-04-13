@@ -20,7 +20,8 @@ import clsx from "clsx";
 const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: 345,
-    height: 310
+    height: 310,
+    marginBottom: 32
   },
   card: {},
   media: {
@@ -99,7 +100,7 @@ export const CandidateCard = ({
 
   // TODO: Does the Grow animation still occur with reduce motion on?
   return (
-    <Grid item xs={12} md={2} key={index} className={classes.root}>
+    <Grid item xs={12} md={3} key={index} className={classes.root}>
       <Grow in={true}>
         <Reward
           ref={ref => {
