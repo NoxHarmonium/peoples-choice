@@ -5,7 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    margin: theme.spacing(2, 0, 0, 2),
+    margin: theme.spacing(10, 0, 0, 2),
     padding: theme.spacing(0, 8, 8, 0)
   }
 }));
@@ -13,11 +13,15 @@ const useStyles = makeStyles(theme => ({
 export const CandidateGrid = ({
   candidates,
   votes,
-  setVotes
+  votesRemaining,
+  setVotes,
+  setVotesRemaining
 }: {
   candidates: Candidates;
   votes: Votes;
+  votesRemaining: number;
   setVotes: (votes: Votes) => void;
+  setVotesRemaining: (votesRemaining: number) => void;
 }) => {
   const styles = useStyles();
   return (
@@ -27,7 +31,9 @@ export const CandidateGrid = ({
           candidate={candidate}
           index={index}
           votes={votes}
+          votesRemaining={votesRemaining}
           setVotes={setVotes}
+          setVotesRemaining={setVotesRemaining}
           key={index}
         />
       ))}

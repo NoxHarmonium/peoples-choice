@@ -22,3 +22,11 @@ export type VotesResponse = {
   votes: Votes;
   votesRemaining: number;
 };
+
+export type TallyEntry = {
+  rank: number;
+  email: string;
+};
+export type TallyResponse = {
+  tallyEntries: ReadonlyArray<TallyEntry>;
+};

@@ -11,12 +11,12 @@ import {
 import { CandidateGrid } from "../components/candidate-grid";
 import { Header } from "../components/header";
 import theme from "../utils/theme";
-import Head from "next/head";
 
 const Vote = () => {
   const [loading, setLoading] = useState(true);
   const [candidates, setCandidates] = useState<Candidates>([]);
   const [votes, setVotes] = useState<Votes>([]);
+  const [votesRemaining, setVotesRemaining] = useState<number>(0);
 
   useEffect(() => {
     setLoading(true);
@@ -42,11 +42,15 @@ const Vote = () => {
         const {
           candidates
         } = (await candidateResponse.json()) as CandidatesResponse;
-        const { votes } = (await votesResponse.json()) as VotesResponse;
+        const {
+          votes,
+          votesRemaining
+        } = (await votesResponse.json()) as VotesResponse;
         // Do the knuth shuff
         const shuffledCandidates = knuthShuff(candidates);
         setCandidates(shuffledCandidates);
         setVotes(votes);
+        setVotesRemaining(votesRemaining);
       } catch (e) {
         console.error("Error caught while fetching data: ", e);
       } finally {
@@ -58,18 +62,16 @@ const Vote = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Head>
-        <title>People's Choice Awards :: Voting</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      </Head>
-      <Header />
+      <Header votesRemaining={votesRemaining} />
       {loading ? (
         <CircularProgress />
       ) : (
         <CandidateGrid
           candidates={candidates}
           votes={votes}
+          votesRemaining={votesRemaining}
           setVotes={setVotes}
+          setVotesRemaining={setVotesRemaining}
         />
       )}
     </ThemeProvider>

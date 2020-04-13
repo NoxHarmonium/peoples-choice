@@ -38,18 +38,22 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export const Header = () => {
+export const Header = ({ votesRemaining }: { votesRemaining?: number }) => {
   const classes = useStyles();
   return (
     <>
       <CssBaseline />
-      <AppBar position="static" elevation={0} className={classes.root}>
+      <AppBar position="fixed" elevation={0} className={classes.root}>
         <Toolbar className={classes.toolbar}>
           <div className={classes.left} />
           <Typography variant="h6" className={classes.title}>
             People's Choice Awards
           </Typography>
-          <div className={classes.right} />
+          <div className={classes.right}>
+            {votesRemaining === undefined
+              ? undefined
+              : `${votesRemaining} Votes Remaining`}
+          </div>
         </Toolbar>
       </AppBar>
     </>

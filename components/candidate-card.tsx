@@ -15,6 +15,7 @@ import {
 import Reward from "react-rewards";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import { Candidate, Votes } from "../utils/types";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -41,18 +42,28 @@ const useStyles = makeStyles(theme => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center"
+  },
+  disabledActionArea: {
+    pointerEvents: "none",
+    "&:hover $focusHighlight": {
+      opacity: 0
+    }
   }
 }));
 
 export const CandidateCard = ({
   candidate,
   votes,
+  votesRemaining,
   setVotes,
+  setVotesRemaining,
   index
 }: {
   candidate: Candidate;
   votes: Votes;
+  votesRemaining: number;
   setVotes: (votes: Votes) => void;
+  setVotesRemaining: (votesRemaining: number) => void;
   index: number;
 }) => {
   const classes = useStyles();
@@ -60,6 +71,7 @@ export const CandidateCard = ({
 
   const voteCount = votes.filter(v => v === candidate.primaryEmail).length;
   const hasBeenVotedFor = voteCount > 0;
+  const locked = votesRemaining === 0;
 
   const onVote = useCallback(() => {
     fetch("/api/votes", {
@@ -76,13 +88,14 @@ export const CandidateCard = ({
           throw new Error("Network response was not ok");
         }
         setVotes([...votes, candidate.primaryEmail]);
+        setVotesRemaining(votesRemaining - 1);
 
         if (reward !== undefined) {
           reward.rewardMe();
         }
       })
       .catch(err => console.error(err));
-  }, [candidate, votes, setVotes, reward]);
+  }, [candidate, votes, setVotes, reward, votesRemaining, setVotesRemaining]);
 
   // TODO: Does the Grow animation still occur with reduce motion on?
   return (
@@ -98,7 +111,12 @@ export const CandidateCard = ({
             className={hasBeenVotedFor ? classes.voted : ""}
             onClick={onVote}
           >
-            <CardActionArea className={classes.cardActionArea}>
+            <CardActionArea
+              className={clsx({
+                [classes.cardActionArea]: true,
+                [classes.disabledActionArea]: locked
+              })}
+            >
               <CardMedia
                 className={classes.media}
                 image={
@@ -111,18 +129,20 @@ export const CandidateCard = ({
                   {candidate.name.fullName}
                 </Typography>
                 <Typography>
-                  {voteCount > 0 ? "Click to Vote again!" : "Click to Vote!"}
+                  {votesRemaining === 0
+                    ? "Thanks for voting"
+                    : voteCount > 0
+                    ? "Click to Vote again!"
+                    : "Click to Vote!"}
                 </Typography>
-                <Typography>
-                  <div style={{ minHeight: "2rem" }}>
-                    {Array.from({ length: voteCount }, (_, index) => (
-                      <span key={index}>
-                        <ThumbUpIcon />
-                        {"  "}
-                      </span>
-                    ))}
-                  </div>
-                </Typography>
+                <div style={{ minHeight: "2rem" }}>
+                  {Array.from({ length: voteCount }, (_, index) => (
+                    <span key={index}>
+                      <ThumbUpIcon />
+                      {"  "}
+                    </span>
+                  ))}
+                </div>
               </CardContent>
             </CardActionArea>
           </Card>

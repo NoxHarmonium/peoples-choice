@@ -14,7 +14,8 @@ const useStyles = makeStyles(theme => ({
       height: "80vh",
       minHeight: 500,
       maxHeight: 1300
-    }
+    },
+    margin: theme.spacing(8, 0, 0, 0)
   },
   container: {
     marginTop: theme.spacing(3),
