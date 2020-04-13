@@ -1,5 +1,4 @@
 import { AppBar, Toolbar, makeStyles } from "@material-ui/core";
-import CssBaseline from "@material-ui/core/CssBaseline";
 import Typography from "./typography";
 
 const useStyles = makeStyles(theme => ({
@@ -41,21 +40,18 @@ const useStyles = makeStyles(theme => ({
 export const Header = ({ votesRemaining }: { votesRemaining?: number }) => {
   const classes = useStyles();
   return (
-    <>
-      <CssBaseline />
-      <AppBar position="fixed" elevation={0} className={classes.root}>
-        <Toolbar className={classes.toolbar}>
-          <div className={classes.left} />
-          <Typography variant="h6" className={classes.title}>
-            People's Choice Awards
-          </Typography>
-          <div className={classes.right}>
-            {votesRemaining === undefined
-              ? undefined
-              : `${votesRemaining} Votes Remaining`}
-          </div>
-        </Toolbar>
-      </AppBar>
-    </>
+    <AppBar position="fixed" elevation={0} className={classes.root}>
+      <Toolbar className={classes.toolbar}>
+        <div className={classes.left} />
+        <Typography variant="h6" className={classes.title}>
+          People's Choice Awards
+        </Typography>
+        <div className={classes.right}>
+          {votesRemaining === undefined
+            ? undefined
+            : `${votesRemaining} Votes Remaining`}
+        </div>
+      </Toolbar>
+    </AppBar>
   );
 };

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import fetch from "isomorphic-unfetch";
-import { CircularProgress, ThemeProvider } from "@material-ui/core";
+import { CircularProgress } from "@material-ui/core";
 import { knuthShuffle as knuthShuff } from "knuth-shuffle";
 import {
   Candidates,
@@ -10,7 +10,6 @@ import {
 } from "../utils/types";
 import { CandidateGrid } from "../components/candidate-grid";
 import { Header } from "../components/header";
-import theme from "../utils/theme";
 
 const Vote = () => {
   const [loading, setLoading] = useState(true);
@@ -61,7 +60,7 @@ const Vote = () => {
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <Header votesRemaining={votesRemaining} />
       {loading ? (
         <CircularProgress />
@@ -74,7 +73,7 @@ const Vote = () => {
           setVotesRemaining={setVotesRemaining}
         />
       )}
-    </ThemeProvider>
+    </>
   );
 };
 

@@ -1,10 +1,9 @@
 import { Header } from "../components/header";
 import theme from "../utils/theme";
-import { ThemeProvider, makeStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import { TallyEntry, TallyResponse } from "../utils/types";
 import { useState, useEffect, useCallback } from "react";
 import CustomButton from "../components/custom-button";
-import { ThreeSixty } from "@material-ui/icons";
 
 const useStyles = makeStyles(theme => ({
   mainContent: {
@@ -67,7 +66,7 @@ const Admin = () => {
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <Header />
       <div className={classes.mainContent}>
         <h3>Current Tally</h3>
@@ -87,7 +86,7 @@ const Admin = () => {
           Reset All Votes
         </CustomButton>
       </div>
-    </ThemeProvider>
+    </>
   );
 };
 
