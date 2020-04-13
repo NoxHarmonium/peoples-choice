@@ -16,6 +16,7 @@ const Admin = () => {
 
   const [loading, setLoading] = useState(true);
   const [tally, setTally] = useState<ReadonlyArray<TallyEntry>>([]);
+  const [error, setError] = useState<string | undefined>();
 
   useEffect(() => {
     setLoading(true);
@@ -29,6 +30,12 @@ const Admin = () => {
           return;
         }
 
+        if (tallyResponse.status === 403) {
+          throw new Error(
+            "Cannot access the admin page if you're not an admin."
+          );
+        }
+
         if (!tallyResponse.ok) {
           throw new Error("One ore more network responses were not ok");
         }
@@ -38,6 +45,7 @@ const Admin = () => {
         setTally(tallyEntries);
       } catch (e) {
         console.error("Error caught while fetching data: ", e);
+        setError(e.message ?? "An unknown error occurred");
       } finally {
         setLoading(false);
       }
@@ -65,26 +73,32 @@ const Admin = () => {
     doReset();
   }, []);
 
+  const MainSection = () => (
+    <>
+      <h3>Current Tally</h3>
+      <ol>
+        {tally.map(({ emails, rank, count }, index) => (
+          <p key={index}>
+            {rank}: ({count} votes) - {emails.join(", ")}
+          </p>
+        ))}
+      </ol>
+      <CustomButton
+        color="secondary"
+        variant="contained"
+        size="large"
+        onClick={resetOnClick}
+      >
+        Reset All Votes
+      </CustomButton>
+    </>
+  );
+
   return (
     <>
       <Header />
       <div className={classes.mainContent}>
-        <h3>Current Tally</h3>
-        <ol>
-          {tally.map(({ emails, rank, count }, index) => (
-            <p key={index}>
-              {rank}: ({count} votes) - {emails.join(", ")}
-            </p>
-          ))}
-        </ol>
-        <CustomButton
-          color="secondary"
-          variant="contained"
-          size="large"
-          onClick={resetOnClick}
-        >
-          Reset All Votes
-        </CustomButton>
+        {error === undefined ? <MainSection /> : <p>{error}</p>}
       </div>
     </>
   );

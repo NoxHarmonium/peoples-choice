@@ -64,6 +64,23 @@ export default apiHandler<TallyResponse>(async (req: NowRequest) => {
     env.JWT_SECRET
   ) as Credentials;
 
+  const decodedIdToken = jwt.decode(oAuthClient.credentials.id_token);
+  if (
+    decodedIdToken === null ||
+    typeof decodedIdToken !== "object" ||
+    typeof decodedIdToken.email !== "string"
+  ) {
+    throw new Error("Invalid ID token");
+  }
+
+  const adminEmails = env.ADMIN_EMAILS.split(",");
+  if (!adminEmails.includes(decodedIdToken.email)) {
+    return {
+      statusCode: 403,
+      body: { error: "Forbidden" }
+    };
+  }
+
   if (req.method === "GET") {
     return getTally();
   } else {
