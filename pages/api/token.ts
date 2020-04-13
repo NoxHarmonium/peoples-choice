@@ -35,7 +35,7 @@ export default apiHandler(async (req: NowRequest) => {
     return {
       statusCode: 302,
       headers: {
-        Location: "/",
+        Location: "/vote",
         "Set-Cookie": serialize("jwt", jwt.sign(tokens, env.JWT_SECRET))
       }
     };

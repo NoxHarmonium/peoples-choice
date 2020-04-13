@@ -52,7 +52,7 @@ function ProductHero() {
         size="large"
         className={classes.button}
         // component="a"
-        href="/premium-themes/onepirate/sign-up/"
+        href="/api/login"
       >
         Log In and Vote!
       </CustomButton>

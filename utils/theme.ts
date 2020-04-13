@@ -12,20 +12,19 @@ export const rawTheme = createMuiTheme({
     }
   },
   typography: {
-    // fontFamily: "'Work Sans', sans-serif",
+    fontFamily: "Roboto, sans-serif",
     fontSize: 14,
     fontWeightLight: 300, // Work Sans
     fontWeightRegular: 400, // Work Sans
     fontWeightMedium: 700 // Roboto Condensed
-    // fontFamilySecondary: "'Roboto Condensed', sans-serif"
   }
 });
 
 const fontHeader = {
   color: rawTheme.palette.text.primary,
   fontWeight: rawTheme.typography.fontWeightMedium,
-  // fontFamily: rawTheme.typography.fontFamilySecondary,
-  textTransform: "uppercase"
+  textTransform: "uppercase",
+  fontFamily: "Righteous, cursive"
 };
 
 const theme = {

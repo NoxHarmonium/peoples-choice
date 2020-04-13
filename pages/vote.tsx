@@ -10,7 +10,8 @@ import {
 } from "../utils/types";
 import { CandidateGrid } from "../components/candidate-grid";
 import { Header } from "../components/header";
-import { theme } from "../utils/theme";
+import theme from "../utils/theme";
+import Head from "next/head";
 
 const Vote = () => {
   const [loading, setLoading] = useState(true);
@@ -57,6 +58,10 @@ const Vote = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      <Head>
+        <title>People's Choice Awards :: Voting</title>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      </Head>
       <Header />
       {loading ? (
         <CircularProgress />

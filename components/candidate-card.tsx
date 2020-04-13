@@ -16,27 +16,44 @@ import Reward from "react-rewards";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import { Candidate, Votes } from "../utils/types";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   root: {
-    maxWidth: 345
+    maxWidth: 345,
+    height: 310
   },
+  card: {},
   media: {
+    width: 140,
     height: 140,
-    backgroundSize: "contain"
+    backgroundSize: "contain",
+    margin: theme.spacing(2),
+    borderRadius: "50%"
   },
   voted: {
-    backgroundColor: "lightblue"
+    backgroundColor: theme.palette.secondary.light
+  },
+  cardActionArea: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
+  },
+  content: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
   }
-});
+}));
 
 export const CandidateCard = ({
   candidate,
   votes,
-  setVotes
+  setVotes,
+  index
 }: {
   candidate: Candidate;
   votes: Votes;
   setVotes: (votes: Votes) => void;
+  index: number;
 }) => {
   const classes = useStyles();
   const [reward, setReward] = useState<undefined | any>(undefined);
@@ -67,9 +84,9 @@ export const CandidateCard = ({
       .catch(err => console.error(err));
   }, [candidate, votes, setVotes, reward]);
 
+  // TODO: Does the Grow animation still occur with reduce motion on?
   return (
-    <Grid item xs={6} md={2}>
-      {// TODO: Does this still happen with reduce motion on?}
+    <Grid item xs={12} md={2} key={index} className={classes.root}>
       <Grow in={true}>
         <Reward
           ref={ref => {
@@ -77,8 +94,11 @@ export const CandidateCard = ({
           }}
           type="emoji"
         >
-          <Card className={hasBeenVotedFor ? classes.voted : ""}>
-            <CardActionArea>
+          <Card
+            className={hasBeenVotedFor ? classes.voted : ""}
+            onClick={onVote}
+          >
+            <CardActionArea className={classes.cardActionArea}>
               <CardMedia
                 className={classes.media}
                 image={
@@ -86,20 +106,25 @@ export const CandidateCard = ({
                 }
                 title={`Portrait of ${candidate.name.fullName}`}
               />
-              <CardContent>
-                <Typography gutterBottom variant="h6">
+              <CardContent className={classes.content}>
+                <Typography variant="h6" style={{ marginBottom: "1rem" }}>
                   {candidate.name.fullName}
+                </Typography>
+                <Typography>
+                  {voteCount > 0 ? "Click to Vote again!" : "Click to Vote!"}
+                </Typography>
+                <Typography>
+                  <div style={{ minHeight: "2rem" }}>
+                    {Array.from({ length: voteCount }, (_, index) => (
+                      <span key={index}>
+                        <ThumbUpIcon />
+                        {"  "}
+                      </span>
+                    ))}
+                  </div>
                 </Typography>
               </CardContent>
             </CardActionArea>
-            <CardActions>
-              <Button size="small" color="primary" onClick={onVote}>
-                Vote
-              </Button>
-              {Array.from({ length: voteCount }, () => (
-                <ThumbUpIcon />
-              ))}
-            </CardActions>
           </Card>
         </Reward>
       </Grow>

@@ -1,5 +1,6 @@
-import { AppBar, Toolbar, Typography, makeStyles } from "@material-ui/core";
+import { AppBar, Toolbar, makeStyles } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import Typography from "./typography";
 
 const useStyles = makeStyles(theme => ({
   title: {
