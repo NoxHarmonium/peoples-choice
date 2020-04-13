@@ -8,5 +8,6 @@ export const env = cleanEnv(process.env, {
   DIRECTORY_DOMAIN: str(),
   EXCLUDED_EMAILS: str(),
   DYNAMO_USER_TABLE_NAME: str(),
-  MAX_VOTES: num()
+  MAX_VOTES: num(),
+  WORKPLACE_NAME: str()
 });

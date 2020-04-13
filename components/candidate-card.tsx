@@ -69,6 +69,7 @@ export const CandidateCard = ({
 
   return (
     <Grid item xs={6} md={2}>
+      {// TODO: Does this still happen with reduce motion on?}
       <Grow in={true}>
         <Reward
           ref={ref => {
