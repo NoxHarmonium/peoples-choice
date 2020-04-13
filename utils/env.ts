@@ -1,6 +1,12 @@
 import { cleanEnv, str, url, num } from "envalid";
 
 export const env = cleanEnv(process.env, {
+  // Trailing underscore gets around zeit reserved environment variable
+  // https://zeit.co/docs/v2/platform/limits/#reserved-variables
+  AWS_ACCESS_KEY_ID_: str(),
+  AWS_SECRET_ACCESS_KEY_: str(),
+  AWS_REGION_: str(),
+
   API_CLIENT_ID: str(),
   API_CLIENT_SECRET: str(),
   API_REDIRECT_URI: url(),

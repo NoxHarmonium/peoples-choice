@@ -24,9 +24,9 @@ export WORKPLACE_NAME="My Corp"
 export DYNAMO_USER_TABLE_NAME="PeoplesChoiceUserTable"
 export DYNAMO_LEDGER_TABLE_NAME="PeoplesChoiceLedgerTable"
 
-export AWS_ACCESS_KEY_ID=SOME_ACCESS_KEY_ID
-export AWS_SECRET_ACCESS_KEY=SOME_SECRET_ACCESS_KEY
-export AWS_REGION=ap-southeast-2
+export AWS_ACCESS_KEY_ID_=SOME_ACCESS_KEY_ID
+export AWS_SECRET_ACCESS_KEY_=SOME_SECRET_ACCESS_KEY
+export AWS_REGION_=ap-southeast-2
 ```
 
 ## TODO

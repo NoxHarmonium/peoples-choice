@@ -1,21 +1,19 @@
-import { NowRequest, NowResponse } from "@now/node";
+import { NowRequest } from "@now/node";
 import { oAuthClient } from "../../utils/oauth-client";
 import jwt from "jsonwebtoken";
 import { env } from "../../utils/env";
 import { Credentials } from "google-auth-library/build/src/auth/credentials";
-import { DynamoDB } from "aws-sdk";
-import { ApiResponse, VotesResponse, TallyResponse } from "../../utils/types";
+import { ApiResponse, TallyResponse } from "../../utils/types";
 import { apiHandler } from "../../utils/handler";
 import { countBy, toPairs, sortBy, update } from "lodash";
-
-const dynamoDb = new DynamoDB.DocumentClient();
+import dynamoClient from "../../utils/dynamo-client";
 
 /**
  * Gets a list of the votes submitted by all users
  */
 const getTally = async (): Promise<ApiResponse<TallyResponse>> => {
   console.log(`Getting user records`);
-  const userRecords = await dynamoDb
+  const userRecords = await dynamoClient
     .scan({
       TableName: env.DYNAMO_USER_TABLE_NAME
     })

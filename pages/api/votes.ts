@@ -1,4 +1,4 @@
-import { NowRequest, NowResponse } from "@now/node";
+import { NowRequest } from "@now/node";
 import { oAuthClient } from "../../utils/oauth-client";
 import jwt from "jsonwebtoken";
 import { env } from "../../utils/env";
@@ -6,8 +6,7 @@ import { Credentials } from "google-auth-library/build/src/auth/credentials";
 import { DynamoDB } from "aws-sdk";
 import { ApiResponse, VotesResponse } from "../../utils/types";
 import { apiHandler } from "../../utils/handler";
-
-const dynamoDb = new DynamoDB.DocumentClient();
+import dynamoClient from "../../utils/dynamo-client";
 
 /**
  * Submits a vote
@@ -20,7 +19,7 @@ const performVote = async (
   targetEmail: string
 ): Promise<ApiResponse<VotesResponse>> => {
   console.log(`Getting user record for: [${email}]`);
-  const userRecord = await dynamoDb
+  const userRecord = await dynamoClient
     .get({
       TableName: env.DYNAMO_USER_TABLE_NAME,
       Key: {
@@ -43,7 +42,7 @@ const performVote = async (
 
   console.log(`Appending vote for [${targetEmail}] for user [${email}]`);
 
-  const updated = await dynamoDb
+  const updated = await dynamoClient
     .update({
       TableName: env.DYNAMO_USER_TABLE_NAME,
       Key: {
@@ -84,7 +83,7 @@ const performVote = async (
  */
 const getVotes = async (email: string): Promise<ApiResponse<VotesResponse>> => {
   console.log(`Getting user record for: [${email}]`);
-  const userRecord = await dynamoDb
+  const userRecord = await dynamoClient
     .get({
       TableName: env.DYNAMO_USER_TABLE_NAME,
       Key: {
