@@ -6,7 +6,7 @@ import { Credentials } from "google-auth-library/build/src/auth/credentials";
 import { DynamoDB } from "aws-sdk";
 import { ApiResponse, VotesResponse, TallyResponse } from "../../utils/types";
 import { apiHandler } from "../../utils/handler";
-import { countBy, toPairs, sortBy } from "lodash";
+import { countBy, toPairs, sortBy, update } from "lodash";
 
 const dynamoDb = new DynamoDB.DocumentClient();
 
@@ -26,14 +26,23 @@ const getTally = async (): Promise<ApiResponse<TallyResponse>> => {
       ? []
       : userRecords.Items.flatMap(item => item.vote_targets);
 
-  const groupedVotes = sortBy(toPairs(countBy(votes)), ([_, n]) => -n);
+  // Future work: Find an Object.entries that supports number keys
+  const voteTuples = Object.entries(countBy(votes));
+  const groupedVotes = voteTuples.reduce<Record<number, ReadonlyArray<string>>>(
+    (prev, [email, count]) =>
+      update(prev, count, (emails?: string[]) => [...(emails ?? []), email]),
+    {}
+  );
+  const rankedVotes = sortBy(toPairs(groupedVotes), ([count, _]) => -count);
 
   return {
     statusCode: 200,
     body: {
-      tallyEntries: groupedVotes.map(([email, _], index) => ({
-        rank: index,
-        email
+      tallyEntries: rankedVotes.map(([count, emails], index) => ({
+        rank: index + 1,
+        // 🙄
+        count: parseInt(count, 10),
+        emails
       }))
     }
   };

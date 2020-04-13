@@ -3,7 +3,6 @@ import { oAuthClient } from "../../utils/oauth-client";
 import jwt from "jsonwebtoken";
 import { env } from "../../utils/env";
 import { Credentials } from "google-auth-library/build/src/auth/credentials";
-import { google } from "googleapis";
 import { DynamoDB } from "aws-sdk";
 import { ApiResponse, VotesResponse } from "../../utils/types";
 import { apiHandler } from "../../utils/handler";
@@ -56,7 +55,7 @@ const performVote = async (
         "attribute_not_exists(total_votes) or total_votes <= :max_votes",
       ExpressionAttributeValues: {
         ":default_votes": 0,
-        ":max_votes": 3,
+        ":max_votes": env.MAX_VOTES,
         ":default_vote_targets": [],
         ":vote_increment": 1,
         ":vote_target": [targetEmail]

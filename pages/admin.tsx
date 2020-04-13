@@ -71,9 +71,9 @@ const Admin = () => {
       <div className={classes.mainContent}>
         <h3>Current Tally</h3>
         <ol>
-          {tally.map(({ email, rank }, index) => (
+          {tally.map(({ emails, rank, count }, index) => (
             <p key={index}>
-              {rank} - {email}
+              {rank}: ({count} votes) - {emails.join(", ")}
             </p>
           ))}
         </ol>

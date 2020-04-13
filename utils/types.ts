@@ -25,7 +25,8 @@ export type VotesResponse = {
 
 export type TallyEntry = {
   rank: number;
-  email: string;
+  emails: ReadonlyArray<string>;
+  count: number;
 };
 export type TallyResponse = {
   tallyEntries: ReadonlyArray<TallyEntry>;
