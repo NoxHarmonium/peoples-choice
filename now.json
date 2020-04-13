@@ -1,0 +1,17 @@
+{
+  "env": {
+    "API_CLIENT_ID": "@api_client_id",
+    "API_CLIENT_SECRET": "@api_client_secret",
+    "JWT_SECRET": "@jwt_secret",
+    "DIRECTORY_DOMAIN": "@directory_domain",
+    "ADMIN_EMAILS": "@admin_emails",
+    "EXCLUDED_EMAILS": "@excluded_emails",
+    "AWS_ACCESS_KEY_ID": "@aws_access_key_id",
+    "AWS_SECRET_ACCESS_KEY": "@aws_secret_access_key",
+    "AWS_REGION": "@aws_region",
+    "API_REDIRECT_URI": "http://localhost:${PORT:-3000}/api/token",
+    "MAX_VOTES": "3",
+    "WORKPLACE_NAME": "Agile Digital",
+    "DYNAMO_USER_TABLE_NAME": "AgilePeoplesChoiceUserTable"
+  }
+}

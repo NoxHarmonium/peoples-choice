@@ -1,7 +1,7 @@
 {
   "name": "agile-peoples-choice",
   "version": "1.0.0",
-  "description": "",
+  "description": "Feeling grateful? Want to recognise a colleague?",
   "main": "index.js",
   "scripts": {
     "dev": "next",
@@ -34,10 +34,11 @@
     "@material-ui/icons": "^4.9.1",
     "@types/jsonwebtoken": "^8.3.8",
     "@types/knuth-shuffle": "^1.0.0",
-    "@types/node": "^13.7.4",
     "@types/lodash": "^4.14.149",
+    "@types/node": "^13.7.4",
     "@types/react": "^16.9.22",
     "isomorphic-unfetch": "^3.0.0",
+    "now": "^17.1.1",
     "prettier": "^1.19.1",
     "typescript": "^3.8.2"
   }
