@@ -1,12 +1,13 @@
 import { NowRequest } from "@now/node";
-import { makeOAuthClient } from "../../utils/oauth-client";
-import jwt from "jsonwebtoken";
-import { env } from "../../utils/env";
 import { Credentials } from "google-auth-library/build/src/auth/credentials";
-import { ApiResponse, TallyResponse } from "../../utils/types";
-import { apiHandler } from "../../utils/handler";
-import { countBy, toPairs, sortBy, update } from "lodash";
+import jwt from "jsonwebtoken";
+import { countBy, sortBy, toPairs, update } from "lodash";
+
 import dynamoClient from "../../utils/dynamo-client";
+import { env } from "../../utils/env";
+import { apiHandler } from "../../utils/handler";
+import { makeOAuthClient } from "../../utils/oauth-client";
+import { ApiResponse, TallyResponse } from "../../utils/types";
 
 /**
  * Gets a list of the votes submitted by all users
@@ -19,7 +20,7 @@ const getTally = async (): Promise<ApiResponse<TallyResponse>> => {
     })
     .promise();
 
-  const votes: string[] =
+  const votes: readonly string[] =
     userRecords.Items === undefined
       ? []
       : userRecords.Items.flatMap((item) => item.vote_targets);
@@ -28,7 +29,10 @@ const getTally = async (): Promise<ApiResponse<TallyResponse>> => {
   const voteTuples = Object.entries(countBy(votes));
   const groupedVotes = voteTuples.reduce<Record<number, ReadonlyArray<string>>>(
     (prev, [email, count]) =>
-      update(prev, count, (emails?: string[]) => [...(emails ?? []), email]),
+      update(prev, count, (emails?: readonly string[]) => [
+        ...(emails ?? []),
+        email,
+      ]),
     {}
   );
   const rankedVotes = sortBy(toPairs(groupedVotes), ([count, _]) => -count);
@@ -58,6 +62,7 @@ export default apiHandler<TallyResponse>(async (req: NowRequest) => {
   }
 
   const oAuthClient = makeOAuthClient(req);
+  // eslint-disable-next-line functional/immutable-data
   oAuthClient.credentials = jwt.verify(
     req.cookies.jwt,
     env.JWT_SECRET

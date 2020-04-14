@@ -1,13 +1,15 @@
-import { Candidates, Candidate, Votes } from "../utils/types";
-import { CandidateCard } from "./candidate-card";
 import { Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import React from "react";
 
-const useStyles = makeStyles(theme => ({
+import { Candidates, Votes } from "../utils/types";
+import { CandidateCard } from "./candidate-card";
+
+const useStyles = makeStyles((theme) => ({
   root: {
     margin: theme.spacing(10, 0, 0, 2),
-    padding: theme.spacing(0, 8, 8, 0)
-  }
+    padding: theme.spacing(0, 8, 8, 0),
+  },
 }));
 
 export const CandidateGrid = ({
@@ -15,13 +17,13 @@ export const CandidateGrid = ({
   votes,
   votesRemaining,
   setVotes,
-  setVotesRemaining
+  setVotesRemaining,
 }: {
-  candidates: Candidates;
-  votes: Votes;
-  votesRemaining: number;
-  setVotes: (votes: Votes) => void;
-  setVotesRemaining: (votesRemaining: number) => void;
+  readonly candidates: Candidates;
+  readonly votes: Votes;
+  readonly votesRemaining: number;
+  readonly setVotes: (votes: Votes) => void;
+  readonly setVotesRemaining: (votesRemaining: number) => void;
 }) => {
   const styles = useStyles();
   return (

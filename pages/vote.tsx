@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
-import fetch from "isomorphic-unfetch";
 import { CircularProgress, makeStyles } from "@material-ui/core";
+import fetch from "isomorphic-unfetch";
 import { knuthShuffle as knuthShuff } from "knuth-shuffle";
-import {
-  Candidates,
-  Votes,
-  CandidatesResponse,
-  VotesResponse,
-} from "../utils/types";
+import React, { useEffect, useState } from "react";
+
 import { CandidateGrid } from "../components/candidate-grid";
 import { Header } from "../components/header";
+import {
+  Candidates,
+  CandidatesResponse,
+  Votes,
+  VotesResponse,
+} from "../utils/types";
 
 const useStyles = makeStyles((theme) => ({
   loadingContainer: {

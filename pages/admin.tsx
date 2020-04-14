@@ -1,16 +1,21 @@
-import { Header } from "../components/header";
-import theme from "../utils/theme";
-import { makeStyles } from "@material-ui/core";
-import { TallyEntry, TallyResponse } from "../utils/types";
-import { useState, useEffect, useCallback } from "react";
-import CustomButton from "../components/custom-button";
+import { CircularProgress,makeStyles } from "@material-ui/core";
+import React, { useCallback,useEffect, useState } from "react";
 
-const useStyles = makeStyles(theme => ({
+import CustomButton from "../components/custom-button";
+import { Header } from "../components/header";
+import { TallyEntry, TallyResponse } from "../utils/types";
+
+const useStyles = makeStyles((theme) => ({
   mainContent: {
-    margin: theme.spacing(14, 4, 4, 4)
-  }
+    margin: theme.spacing(14, 4, 4, 4),
+  },
+  loadingContainer: {
+    margin: theme.spacing(20, 4, 4, 4),
+    textAlign: "center",
+  },
 }));
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const Admin = () => {
   const classes = useStyles();
 
@@ -56,7 +61,7 @@ const Admin = () => {
   const resetOnClick = useCallback(() => {
     const doReset = async () => {
       const resetResponse = await fetch("/api/reset", {
-        method: "POST"
+        method: "POST",
       });
       if (resetResponse.status === 401) {
         console.log("Unauthorized response. Redirecting to login.");
@@ -68,6 +73,7 @@ const Admin = () => {
         throw new Error("One ore more network responses were not ok");
       }
 
+      // eslint-disable-next-line no-restricted-globals
       location.reload();
     };
     doReset();
@@ -97,9 +103,15 @@ const Admin = () => {
   return (
     <>
       <Header />
-      <div className={classes.mainContent}>
-        {error === undefined ? <MainSection /> : <p>{error}</p>}
-      </div>
+      {loading ? (
+        <div className={classes.loadingContainer}>
+          <CircularProgress />
+        </div>
+      ) : (
+        <div className={classes.mainContent}>
+          {error === undefined ? <MainSection /> : <p>{error}</p>}
+        </div>
+      )}
     </>
   );
 };

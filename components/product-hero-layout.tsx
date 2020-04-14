@@ -1,10 +1,9 @@
-import React from "react";
-import PropTypes from "prop-types";
-import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import { makeStyles } from "@material-ui/core/styles";
+import clsx from "clsx";
+import React, { PropsWithChildren } from "react";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     color: theme.palette.common.white,
     position: "relative",
@@ -13,16 +12,16 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.up("sm")]: {
       height: "80vh",
       minHeight: 500,
-      maxHeight: 1300
+      maxHeight: 1300,
     },
-    margin: theme.spacing(8, 0, 0, 0)
+    margin: theme.spacing(8, 0, 0, 0),
   },
   container: {
     marginTop: theme.spacing(3),
     marginBottom: theme.spacing(14),
     display: "flex",
     flexDirection: "column",
-    alignItems: "center"
+    alignItems: "center",
   },
   backdrop: {
     position: "absolute",
@@ -32,7 +31,7 @@ const useStyles = makeStyles(theme => ({
     bottom: 0,
     backgroundColor: theme.palette.common.black,
     opacity: 0.5,
-    zIndex: -1
+    zIndex: -1,
   },
   background: {
     position: "absolute",
@@ -42,17 +41,20 @@ const useStyles = makeStyles(theme => ({
     bottom: 0,
     backgroundSize: "cover",
     backgroundRepeat: "no-repeat",
-    zIndex: -2
+    zIndex: -2,
   },
   arrowDown: {
     position: "absolute",
-    bottom: theme.spacing(4)
-  }
+    bottom: theme.spacing(4),
+  },
 }));
 
-function ProductHeroLayout(props) {
-  const { backgroundClassName, children } = props;
-
+function ProductHeroLayout({
+  backgroundClassName,
+  children,
+}: PropsWithChildren<{
+  readonly backgroundClassName: string;
+}>) {
   const classes = useStyles();
 
   return (
@@ -78,10 +80,5 @@ function ProductHeroLayout(props) {
     </section>
   );
 }
-
-ProductHeroLayout.propTypes = {
-  backgroundClassName: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired
-};
 
 export default ProductHeroLayout;

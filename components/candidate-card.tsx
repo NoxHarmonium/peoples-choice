@@ -1,21 +1,20 @@
-import { useState, useCallback } from "react";
-import fetch from "isomorphic-unfetch";
-import { makeStyles } from "@material-ui/core/styles";
 import {
   Card,
   CardActionArea,
-  CardMedia,
   CardContent,
-  Typography,
-  CardActions,
-  Button,
+  CardMedia,
   Grid,
   Grow,
+  Typography,
 } from "@material-ui/core";
-import Reward from "react-rewards";
+import { makeStyles } from "@material-ui/core/styles";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
-import { Candidate, Votes } from "../utils/types";
 import clsx from "clsx";
+import fetch from "isomorphic-unfetch";
+import React, { useCallback,useState } from "react";
+import Reward from "react-rewards";
+
+import { Candidate, Votes } from "../utils/types";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -60,15 +59,20 @@ export const CandidateCard = ({
   setVotesRemaining,
   index,
 }: {
-  candidate: Candidate;
-  votes: Votes;
-  votesRemaining: number;
-  setVotes: (votes: Votes) => void;
-  setVotesRemaining: (votesRemaining: number) => void;
-  index: number;
+  readonly candidate: Candidate;
+  readonly votes: Votes;
+  readonly votesRemaining: number;
+  readonly setVotes: (votes: Votes) => void;
+  readonly setVotesRemaining: (votesRemaining: number) => void;
+  readonly index: number;
 }) => {
   const classes = useStyles();
-  const [reward, setReward] = useState<undefined | any>(undefined);
+  const [reward, setReward] = useState<
+    | undefined
+    | {
+        readonly rewardMe: () => void;
+      }
+  >(undefined);
   const [submittingVote, setSubmittingVote] = useState(false);
 
   const voteCount = votes.filter((v) => v === candidate.primaryEmail).length;

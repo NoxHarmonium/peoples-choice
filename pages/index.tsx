@@ -1,7 +1,8 @@
+import React from "react";
+
 import { Header } from "../components/header";
-import theme from "../utils/theme";
-import ProductHero from "../components/product-hero";
 import ProductHowItWorks from "../components/how-it-works";
+import ProductHero from "../components/product-hero";
 
 const Home = () => (
   <>

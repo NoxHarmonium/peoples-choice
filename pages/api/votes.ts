@@ -1,11 +1,12 @@
 import { NowRequest } from "@now/node";
-import { makeOAuthClient } from "../../utils/oauth-client";
-import jwt from "jsonwebtoken";
-import { env } from "../../utils/env";
 import { Credentials } from "google-auth-library/build/src/auth/credentials";
-import { ApiResponse, VotesResponse } from "../../utils/types";
-import { apiHandler } from "../../utils/handler";
+import jwt from "jsonwebtoken";
+
 import dynamoClient from "../../utils/dynamo-client";
+import { env } from "../../utils/env";
+import { apiHandler } from "../../utils/handler";
+import { makeOAuthClient } from "../../utils/oauth-client";
+import { ApiResponse, VotesResponse } from "../../utils/types";
 
 /**
  * Submits a vote
@@ -71,7 +72,7 @@ const performVote = async (
     body: {
       votesRemaining:
         env.MAX_VOTES - (updated.Attributes.total_votes as number),
-      votes: updated.Attributes.vote_targets as string[],
+      votes: updated.Attributes.vote_targets as readonly string[],
     },
   };
 };
@@ -91,7 +92,7 @@ const getVotes = async (email: string): Promise<ApiResponse<VotesResponse>> => {
     })
     .promise();
 
-  const votes: string[] =
+  const votes: readonly string[] =
     userRecord.Item === undefined ? [] : userRecord.Item.vote_targets;
 
   return {
@@ -115,6 +116,7 @@ export default apiHandler<VotesResponse>(async (req: NowRequest) => {
   }
 
   const oAuthClient = makeOAuthClient(req);
+  // eslint-disable-next-line functional/immutable-data
   oAuthClient.credentials = jwt.verify(
     req.cookies.jwt,
     env.JWT_SECRET

@@ -1,31 +1,31 @@
-import React from "react";
-import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
+import React from "react";
+
 import CustomButton from "./custom-button";
-import Typography from "./typography";
 import ProductHeroLayout from "./product-hero-layout";
+import Typography from "./typography";
 
 const backgroundImage = "/trophy.jpg";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   background: {
     backgroundImage: `url(${backgroundImage})`,
     backgroundColor: "#7fc7d9", // Average color of the background image.
-    backgroundPosition: "center"
+    backgroundPosition: "center",
   },
   button: {
-    minWidth: 200
+    minWidth: 200,
   },
   h5: {
     marginBottom: theme.spacing(4),
     marginTop: theme.spacing(4),
     [theme.breakpoints.up("sm")]: {
-      marginTop: theme.spacing(10)
-    }
+      marginTop: theme.spacing(10),
+    },
   },
   more: {
-    marginTop: theme.spacing(2)
-  }
+    marginTop: theme.spacing(2),
+  },
 }));
 
 function ProductHero() {
@@ -33,8 +33,6 @@ function ProductHero() {
 
   return (
     <ProductHeroLayout backgroundClassName={classes.background}>
-      {/* Increase the network loading priority of the background image. */}
-      <img style={{ display: "none" }} src={backgroundImage} />
       <Typography color="inherit" align="center" variant="h2" marked="center">
         Recognise Your Teammates
       </Typography>

@@ -1,11 +1,10 @@
 import { NowRequest } from "@now/node";
-import { env } from "../../utils/env";
-
-import { makeOAuthClient } from "../../utils/oauth-client";
 import { serialize } from "cookie";
-
 import jwt from "jsonwebtoken";
+
+import { env } from "../../utils/env";
 import { apiHandler } from "../../utils/handler";
+import { makeOAuthClient } from "../../utils/oauth-client";
 
 /**
  * Handles the redirect back from Google auth

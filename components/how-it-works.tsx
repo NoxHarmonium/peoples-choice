@@ -1,10 +1,11 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
 import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
+import { makeStyles } from "@material-ui/core/styles";
+import { EmojiEvents,HowToReg, HowToVote } from "@material-ui/icons";
+import React from "react";
+
 import Button from "./custom-button";
 import Typography from "./typography";
-import { HowToVote, HowToReg, EmojiEvents } from "@material-ui/icons";
 
 const useStyles = makeStyles(theme => ({
   root: {

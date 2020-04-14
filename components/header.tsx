@@ -1,43 +1,45 @@
-import { AppBar, Toolbar, makeStyles } from "@material-ui/core";
+import { AppBar, makeStyles,Toolbar } from "@material-ui/core";
+import React from "react";
+
 import Typography from "./typography";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   title: {
     fontSize: 24,
-    color: theme.palette.common.white
+    color: theme.palette.common.white,
   },
   toolbar: {
     justifyContent: "space-between",
     height: 64,
     [theme.breakpoints.up("sm")]: {
-      height: 70
-    }
+      height: 70,
+    },
   },
   left: {
-    flex: 1
+    flex: 1,
   },
   leftLinkActive: {
-    color: theme.palette.common.white
+    color: theme.palette.common.white,
   },
   right: {
     flex: 1,
     display: "flex",
-    justifyContent: "flex-end"
+    justifyContent: "flex-end",
   },
   rightLink: {
     fontSize: 16,
     color: theme.palette.common.white,
-    marginLeft: theme.spacing(3)
+    marginLeft: theme.spacing(3),
   },
   linkSecondary: {
-    color: theme.palette.secondary.main
+    color: theme.palette.secondary.main,
   },
   root: {
-    color: theme.palette.common.white
-  }
+    color: theme.palette.common.white,
+  },
 }));
 
-export const Header = ({ votesRemaining }: { votesRemaining?: number }) => {
+export const Header = ({ votesRemaining }: { readonly votesRemaining?: number }) => {
   const classes = useStyles();
   return (
     <AppBar position="fixed" elevation={0} className={classes.root}>

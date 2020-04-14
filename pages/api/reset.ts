@@ -1,11 +1,12 @@
 import { NowRequest } from "@now/node";
-import { makeOAuthClient } from "../../utils/oauth-client";
-import jwt from "jsonwebtoken";
-import { env } from "../../utils/env";
 import { Credentials } from "google-auth-library/build/src/auth/credentials";
-import { ApiResponse } from "../../utils/types";
-import { apiHandler } from "../../utils/handler";
+import jwt from "jsonwebtoken";
+
 import dynamoClient from "../../utils/dynamo-client";
+import { env } from "../../utils/env";
+import { apiHandler } from "../../utils/handler";
+import { makeOAuthClient } from "../../utils/oauth-client";
+import { ApiResponse } from "../../utils/types";
 
 /**
  * Gets a list of the votes submitted by all users
@@ -55,6 +56,7 @@ export default apiHandler<void>(async (req: NowRequest) => {
 
   const oAuthClient = makeOAuthClient(req);
 
+  // eslint-disable-next-line functional/immutable-data
   oAuthClient.credentials = jwt.verify(
     req.cookies.jwt,
     env.JWT_SECRET

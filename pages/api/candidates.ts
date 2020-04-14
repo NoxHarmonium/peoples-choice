@@ -1,13 +1,15 @@
 import { NowRequest } from "@now/node";
-import { makeOAuthClient } from "../../utils/oauth-client";
+// eslint-disable-next-line @typescript-eslint/camelcase
+import { admin_directory_v1, google } from "googleapis";
 import {
-  OAuth2Client,
   Credentials,
+  OAuth2Client,
 } from "googleapis/node_modules/google-auth-library";
 import jwt from "jsonwebtoken";
+
 import { env } from "../../utils/env";
-import { admin_directory_v1, google } from "googleapis";
 import { apiHandler } from "../../utils/handler";
+import { makeOAuthClient } from "../../utils/oauth-client";
 import { ApiResponse, CandidatesResponse } from "../../utils/types";
 
 /**
@@ -16,6 +18,7 @@ import { ApiResponse, CandidatesResponse } from "../../utils/types";
  * @param excludedEmails a list of email addresses that indicate users that should be excluded
  */
 export const getCandidates = async (
+  // eslint-disable-next-line @typescript-eslint/camelcase
   directoryApi: admin_directory_v1.Admin,
   excludedEmails: readonly string[],
   oAuthClient: OAuth2Client
@@ -65,6 +68,7 @@ export default apiHandler<CandidatesResponse>(async (req: NowRequest) => {
 
   const oAuthClient = makeOAuthClient(req);
 
+  // eslint-disable-next-line functional/immutable-data
   oAuthClient.credentials = jwt.verify(
     req.cookies.jwt,
     env.JWT_SECRET
