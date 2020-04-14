@@ -1,5 +1,5 @@
 import { NowRequest } from "@now/node";
-import { oAuthClient } from "../../utils/oauth-client";
+import { makeOAuthClient } from "../../utils/oauth-client";
 import jwt from "jsonwebtoken";
 import { env } from "../../utils/env";
 import { Credentials } from "google-auth-library/build/src/auth/credentials";
@@ -23,8 +23,8 @@ const performVote = async (
     .get({
       TableName: env.DYNAMO_USER_TABLE_NAME,
       Key: {
-        email: email
-      }
+        email: email,
+      },
     })
     .promise();
 
@@ -35,8 +35,8 @@ const performVote = async (
     return {
       statusCode: 400,
       body: {
-        error: `You have already voted the maximum number of times (${env.MAX_VOTES})`
-      }
+        error: `You have already voted the maximum number of times (${env.MAX_VOTES})`,
+      },
     };
   }
 
@@ -46,7 +46,7 @@ const performVote = async (
     .update({
       TableName: env.DYNAMO_USER_TABLE_NAME,
       Key: {
-        email: email
+        email: email,
       },
       UpdateExpression: `set total_votes = if_not_exists(total_votes, :default_votes) + :vote_increment,
                              vote_targets = list_append(if_not_exists(vote_targets, :default_vote_targets), :vote_target)`,
@@ -57,9 +57,9 @@ const performVote = async (
         ":max_votes": env.MAX_VOTES,
         ":default_vote_targets": [],
         ":vote_increment": 1,
-        ":vote_target": [targetEmail]
+        ":vote_target": [targetEmail],
       },
-      ReturnValues: "UPDATED_NEW"
+      ReturnValues: "UPDATED_NEW",
     })
     .promise();
 
@@ -72,8 +72,8 @@ const performVote = async (
     body: {
       votesRemaining:
         env.MAX_VOTES - (updated.Attributes.total_votes as number),
-      votes: updated.Attributes.vote_targets as string[]
-    }
+      votes: updated.Attributes.vote_targets as string[],
+    },
   };
 };
 
@@ -87,8 +87,8 @@ const getVotes = async (email: string): Promise<ApiResponse<VotesResponse>> => {
     .get({
       TableName: env.DYNAMO_USER_TABLE_NAME,
       Key: {
-        email: email
-      }
+        email: email,
+      },
     })
     .promise();
 
@@ -99,8 +99,8 @@ const getVotes = async (email: string): Promise<ApiResponse<VotesResponse>> => {
     statusCode: 200,
     body: {
       votesRemaining: env.MAX_VOTES - votes.length,
-      votes
-    }
+      votes,
+    },
   };
 };
 
@@ -111,10 +111,11 @@ export default apiHandler<VotesResponse>(async (req: NowRequest) => {
   if (!req.cookies.jwt) {
     return {
       statusCode: 401,
-      body: { error: "Unauthorized" }
+      body: { error: "Unauthorized" },
     };
   }
 
+  const oAuthClient = makeOAuthClient(req);
   oAuthClient.credentials = jwt.verify(
     req.cookies.jwt,
     env.JWT_SECRET
@@ -139,8 +140,8 @@ export default apiHandler<VotesResponse>(async (req: NowRequest) => {
     return {
       statusCode: 400,
       body: {
-        error: `Unsupported method [${req.method}]`
-      }
+        error: `Unsupported method [${req.method}]`,
+      },
     };
   }
 });

@@ -1,5 +1,5 @@
 import { NowRequest } from "@now/node";
-import { oAuthClient } from "../../utils/oauth-client";
+import { makeOAuthClient } from "../../utils/oauth-client";
 import jwt from "jsonwebtoken";
 import { env } from "../../utils/env";
 import { Credentials } from "google-auth-library/build/src/auth/credentials";
@@ -15,14 +15,14 @@ const getTally = async (): Promise<ApiResponse<TallyResponse>> => {
   console.log(`Getting user records`);
   const userRecords = await dynamoClient
     .scan({
-      TableName: env.DYNAMO_USER_TABLE_NAME
+      TableName: env.DYNAMO_USER_TABLE_NAME,
     })
     .promise();
 
   const votes: string[] =
     userRecords.Items === undefined
       ? []
-      : userRecords.Items.flatMap(item => item.vote_targets);
+      : userRecords.Items.flatMap((item) => item.vote_targets);
 
   // Future work: Find an Object.entries that supports number keys
   const voteTuples = Object.entries(countBy(votes));
@@ -40,9 +40,9 @@ const getTally = async (): Promise<ApiResponse<TallyResponse>> => {
         rank: index + 1,
         // 🙄
         count: parseInt(count, 10),
-        emails
-      }))
-    }
+        emails,
+      })),
+    },
   };
 };
 
@@ -53,10 +53,11 @@ export default apiHandler<TallyResponse>(async (req: NowRequest) => {
   if (!req.cookies.jwt) {
     return {
       statusCode: 401,
-      body: { error: "Unauthorized" }
+      body: { error: "Unauthorized" },
     };
   }
 
+  const oAuthClient = makeOAuthClient(req);
   oAuthClient.credentials = jwt.verify(
     req.cookies.jwt,
     env.JWT_SECRET
@@ -75,7 +76,7 @@ export default apiHandler<TallyResponse>(async (req: NowRequest) => {
   if (!adminEmails.includes(decodedIdToken.email)) {
     return {
       statusCode: 403,
-      body: { error: "Forbidden" }
+      body: { error: "Forbidden" },
     };
   }
 
@@ -85,8 +86,8 @@ export default apiHandler<TallyResponse>(async (req: NowRequest) => {
     return {
       statusCode: 400,
       body: {
-        error: `Unsupported method [${req.method}]`
-      }
+        error: `Unsupported method [${req.method}]`,
+      },
     };
   }
 });

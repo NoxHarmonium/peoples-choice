@@ -1,5 +1,5 @@
 import { NowRequest } from "@now/node";
-import { oAuthClient } from "../../utils/oauth-client";
+import { makeOAuthClient } from "../../utils/oauth-client";
 import jwt from "jsonwebtoken";
 import { env } from "../../utils/env";
 import { Credentials } from "google-auth-library/build/src/auth/credentials";
@@ -15,7 +15,7 @@ const postReset = async (): Promise<ApiResponse<void>> => {
 
   const userRecords = await dynamoClient
     .scan({
-      TableName: env.DYNAMO_USER_TABLE_NAME
+      TableName: env.DYNAMO_USER_TABLE_NAME,
     })
     .promise();
 
@@ -29,16 +29,16 @@ const postReset = async (): Promise<ApiResponse<void>> => {
         [env.DYNAMO_USER_TABLE_NAME]: userRecords.Items.map(({ email }) => ({
           DeleteRequest: {
             Key: {
-              email
-            }
-          }
-        }))
-      }
+              email,
+            },
+          },
+        })),
+      },
     })
     .promise();
 
   return {
-    statusCode: 202
+    statusCode: 202,
   };
 };
 
@@ -49,9 +49,11 @@ export default apiHandler<void>(async (req: NowRequest) => {
   if (!req.cookies.jwt) {
     return {
       statusCode: 401,
-      body: { error: "Unauthorized" }
+      body: { error: "Unauthorized" },
     };
   }
+
+  const oAuthClient = makeOAuthClient(req);
 
   oAuthClient.credentials = jwt.verify(
     req.cookies.jwt,
@@ -71,7 +73,7 @@ export default apiHandler<void>(async (req: NowRequest) => {
   if (!adminEmails.includes(decodedIdToken.email)) {
     return {
       statusCode: 403,
-      body: { error: "Forbidden" }
+      body: { error: "Forbidden" },
     };
   }
 
@@ -81,8 +83,8 @@ export default apiHandler<void>(async (req: NowRequest) => {
     return {
       statusCode: 400,
       body: {
-        error: `Unsupported method [${req.method}]`
-      }
+        error: `Unsupported method [${req.method}]`,
+      },
     };
   }
 });

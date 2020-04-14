@@ -13,7 +13,6 @@ $ yarn dev
 ```
 export API_CLIENT_ID="11111-xxxxx.apps.googleusercontent.com"
 export API_CLIENT_SECRET="some secret"
-export API_REDIRECT_URI="http://localhost:${PORT:-3000}/api/token"
 export JWT_SECRET="some random secret"
 export DIRECTORY_DOMAIN="mycorp.com.au"
 export EXCLUDED_EMAILS="hello@mycorp.com.au"

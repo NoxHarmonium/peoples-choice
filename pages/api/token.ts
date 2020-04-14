@@ -1,7 +1,7 @@
 import { NowRequest } from "@now/node";
 import { env } from "../../utils/env";
 
-import { oAuthClient } from "../../utils/oauth-client";
+import { makeOAuthClient } from "../../utils/oauth-client";
 import { serialize } from "cookie";
 
 import jwt from "jsonwebtoken";
@@ -17,8 +17,8 @@ export default apiHandler(async (req: NowRequest) => {
     return {
       statusCode: 400,
       body: {
-        error: "Bad Request"
-      }
+        error: "Bad Request",
+      },
     };
   } else {
     if (typeof req.query.code !== "string") {
@@ -26,18 +26,19 @@ export default apiHandler(async (req: NowRequest) => {
       return {
         statusCode: 400,
         body: {
-          error: "Bad Request"
-        }
+          error: "Bad Request",
+        },
       };
     }
 
+    const oAuthClient = makeOAuthClient(req);
     const { tokens } = await oAuthClient.getToken(req.query.code);
     return {
       statusCode: 302,
       headers: {
         Location: "/vote",
-        "Set-Cookie": serialize("jwt", jwt.sign(tokens, env.JWT_SECRET))
-      }
+        "Set-Cookie": serialize("jwt", jwt.sign(tokens, env.JWT_SECRET)),
+      },
     };
   }
 });

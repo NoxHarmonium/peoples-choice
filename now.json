@@ -9,7 +9,6 @@
     "AWS_ACCESS_KEY_ID_": "@aws_access_key_id",
     "AWS_SECRET_ACCESS_KEY_": "@aws_secret_access_key",
     "AWS_REGION_": "@aws_region",
-    "API_REDIRECT_URI": "http://localhost:${PORT:-3000}/api/token",
     "MAX_VOTES": "3",
     "WORKPLACE_NAME": "Agile Digital",
     "DYNAMO_USER_TABLE_NAME": "AgilePeoplesChoiceUserTable"
