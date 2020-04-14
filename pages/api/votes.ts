@@ -3,7 +3,6 @@ import { makeOAuthClient } from "../../utils/oauth-client";
 import jwt from "jsonwebtoken";
 import { env } from "../../utils/env";
 import { Credentials } from "google-auth-library/build/src/auth/credentials";
-import { DynamoDB } from "aws-sdk";
 import { ApiResponse, VotesResponse } from "../../utils/types";
 import { apiHandler } from "../../utils/handler";
 import dynamoClient from "../../utils/dynamo-client";
