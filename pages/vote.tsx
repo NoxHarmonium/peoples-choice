@@ -1,17 +1,25 @@
 import { useEffect, useState } from "react";
 import fetch from "isomorphic-unfetch";
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress, makeStyles } from "@material-ui/core";
 import { knuthShuffle as knuthShuff } from "knuth-shuffle";
 import {
   Candidates,
   Votes,
   CandidatesResponse,
-  VotesResponse
+  VotesResponse,
 } from "../utils/types";
 import { CandidateGrid } from "../components/candidate-grid";
 import { Header } from "../components/header";
 
+const useStyles = makeStyles((theme) => ({
+  loadingContainer: {
+    margin: theme.spacing(20, 4, 4, 4),
+    textAlign: "center",
+  },
+}));
+
 const Vote = () => {
+  const classes = useStyles();
   const [loading, setLoading] = useState(true);
   const [candidates, setCandidates] = useState<Candidates>([]);
   const [votes, setVotes] = useState<Votes>([]);
@@ -23,7 +31,7 @@ const Vote = () => {
       try {
         const responses = await Promise.all([
           fetch("/api/candidates"),
-          fetch("/api/votes")
+          fetch("/api/votes"),
         ]);
 
         const [candidateResponse, votesResponse] = responses;
@@ -34,16 +42,16 @@ const Vote = () => {
           return;
         }
 
-        if (!responses.every(r => r.ok)) {
+        if (!responses.every((r) => r.ok)) {
           throw new Error("One ore more network responses were not ok");
         }
 
         const {
-          candidates
+          candidates,
         } = (await candidateResponse.json()) as CandidatesResponse;
         const {
           votes,
-          votesRemaining
+          votesRemaining,
         } = (await votesResponse.json()) as VotesResponse;
         // Do the knuth shuff
         const shuffledCandidates = knuthShuff(candidates);
@@ -63,7 +71,9 @@ const Vote = () => {
     <>
       <Header votesRemaining={votesRemaining} />
       {loading ? (
-        <CircularProgress />
+        <div className={classes.loadingContainer}>
+          <CircularProgress />
+        </div>
       ) : (
         <CandidateGrid
           candidates={candidates}

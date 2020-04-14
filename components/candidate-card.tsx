@@ -10,18 +10,18 @@ import {
   CardActions,
   Button,
   Grid,
-  Grow
+  Grow,
 } from "@material-ui/core";
 import Reward from "react-rewards";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import { Candidate, Votes } from "../utils/types";
 import clsx from "clsx";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: 345,
     height: 310,
-    marginBottom: 32
+    marginBottom: 32,
   },
   card: {},
   media: {
@@ -29,27 +29,27 @@ const useStyles = makeStyles(theme => ({
     height: 140,
     backgroundSize: "contain",
     margin: theme.spacing(2),
-    borderRadius: "50%"
+    borderRadius: "50%",
   },
   voted: {
-    backgroundColor: theme.palette.secondary.light
+    backgroundColor: theme.palette.secondary.light,
   },
   cardActionArea: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center"
+    alignItems: "center",
   },
   content: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center"
+    alignItems: "center",
   },
   disabledActionArea: {
     pointerEvents: "none",
     "&:hover $focusHighlight": {
-      opacity: 0
-    }
-  }
+      opacity: 0,
+    },
+  },
 }));
 
 export const CandidateCard = ({
@@ -58,7 +58,7 @@ export const CandidateCard = ({
   votesRemaining,
   setVotes,
   setVotesRemaining,
-  index
+  index,
 }: {
   candidate: Candidate;
   votes: Votes;
@@ -69,22 +69,24 @@ export const CandidateCard = ({
 }) => {
   const classes = useStyles();
   const [reward, setReward] = useState<undefined | any>(undefined);
+  const [submittingVote, setSubmittingVote] = useState(false);
 
-  const voteCount = votes.filter(v => v === candidate.primaryEmail).length;
+  const voteCount = votes.filter((v) => v === candidate.primaryEmail).length;
   const hasBeenVotedFor = voteCount > 0;
   const locked = votesRemaining === 0;
 
   const onVote = useCallback(() => {
+    setSubmittingVote(true);
     fetch("/api/votes", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        targetEmail: candidate.primaryEmail
-      })
+        targetEmail: candidate.primaryEmail,
+      }),
     })
-      .then(resp => {
+      .then((resp) => {
         if (!resp.ok) {
           throw new Error("Network response was not ok");
         }
@@ -95,7 +97,8 @@ export const CandidateCard = ({
           reward.rewardMe();
         }
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err))
+      .finally(() => setSubmittingVote(false));
   }, [candidate, votes, setVotes, reward, votesRemaining, setVotesRemaining]);
 
   // TODO: Does the Grow animation still occur with reduce motion on?
@@ -103,7 +106,7 @@ export const CandidateCard = ({
     <Grid item xs={12} md={3} key={index} className={classes.root}>
       <Grow in={true}>
         <Reward
-          ref={ref => {
+          ref={(ref) => {
             setReward(ref);
           }}
           type="emoji"
@@ -115,7 +118,7 @@ export const CandidateCard = ({
             <CardActionArea
               className={clsx({
                 [classes.cardActionArea]: true,
-                [classes.disabledActionArea]: locked
+                [classes.disabledActionArea]: locked || submittingVote,
               })}
             >
               <CardMedia
