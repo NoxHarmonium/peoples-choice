@@ -37,7 +37,7 @@ export const apiHandler = <ResponseType = JsonValue>(
 export const authenticatedApiHandler = <ResponseType = JsonValue>(
   handler: (
     req: NowRequest,
-    obfusticatedUserId: string
+    userEmail: string
   ) => Promise<ApiResponse<ResponseType>>
 ) => async (req: NowRequest, res: NowResponse) => {
   try {

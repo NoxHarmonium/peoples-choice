@@ -14,7 +14,8 @@ import { ApiResponse, CandidatesResponse } from "../../utils/types";
 export const getCandidates = async (
   // eslint-disable-next-line @typescript-eslint/camelcase
   directoryApi: admin_directory_v1.Admin,
-  excludedEmails: readonly string[]
+  excludedEmails: readonly string[],
+  userEmail: string
 ): Promise<ApiResponse<CandidatesResponse>> => {
   const {
     data: { users },
@@ -42,7 +43,11 @@ export const getCandidates = async (
             },
           })
         )
-        .filter((user) => !excludedEmails.includes(user.primaryEmail)),
+        .filter(
+          (user) =>
+            user.primaryEmail !== userEmail &&
+            !excludedEmails.includes(user.primaryEmail)
+        ),
     },
   };
 };
@@ -51,7 +56,7 @@ export const getCandidates = async (
  * API handler for operations on the Candidate resource
  */
 export default authenticatedApiHandler<CandidatesResponse>(
-  async (req: NowRequest) => {
+  async (req: NowRequest, userEmail: string) => {
     const directoryApi = google.admin({
       version: "directory_v1",
     });
@@ -59,7 +64,7 @@ export default authenticatedApiHandler<CandidatesResponse>(
     const excludedEmails = env.EXCLUDED_EMAILS.split(",");
 
     if (req.method === "GET") {
-      return getCandidates(directoryApi, excludedEmails);
+      return getCandidates(directoryApi, excludedEmails, userEmail);
     } else {
       return {
         statusCode: 400,
