@@ -11,7 +11,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import clsx from "clsx";
 import fetch from "isomorphic-unfetch";
-import React, { useCallback,useState } from "react";
+import React, { useCallback, useState } from "react";
 import Reward from "react-rewards";
 
 import { Candidate, Votes } from "../utils/types";
@@ -80,6 +80,13 @@ export const CandidateCard = ({
   const locked = votesRemaining === 0;
 
   const onVote = useCallback(() => {
+    if (submittingVote) {
+      console.warn(
+        "You are already submitting the last vote. This one will be ignored. Take your time, there's no rush."
+      );
+      return;
+    }
+
     setSubmittingVote(true);
     fetch("/api/votes", {
       method: "POST",
@@ -103,7 +110,15 @@ export const CandidateCard = ({
       })
       .catch((err) => console.error(err))
       .finally(() => setSubmittingVote(false));
-  }, [candidate, votes, setVotes, reward, votesRemaining, setVotesRemaining]);
+  }, [
+    candidate,
+    votes,
+    setVotes,
+    reward,
+    votesRemaining,
+    submittingVote,
+    setVotesRemaining,
+  ]);
 
   // TODO: Does the Grow animation still occur with reduce motion on?
   return (
