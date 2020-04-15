@@ -11,6 +11,7 @@
     "AWS_REGION_": "@aws_region",
     "MAX_VOTES": "3",
     "WORKPLACE_NAME": "Agile Digital",
-    "DYNAMO_USER_TABLE_NAME": "AgilePeoplesChoiceUserTable"
+    "DYNAMO_USER_TABLE_NAME": "AgilePeoplesChoiceUserTable",
+    "OBFUSTICATION_PEPPER": "@obfustication_pepper"
   }
 }
