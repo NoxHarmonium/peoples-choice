@@ -17,22 +17,22 @@ const postReset = async (): Promise<ApiResponse<void>> => {
     })
     .promise();
 
-  if (userRecords.Items === undefined) {
-    return;
+  if (userRecords.Items === undefined || userRecords.Items.length === 0) {
+    return {
+      statusCode: 202,
+    };
   }
 
   await dynamoClient
     .batchWrite({
       RequestItems: {
-        [env.DYNAMO_USER_TABLE_NAME]: userRecords.Items.map(
-          ({ obfusticatedEmail }) => ({
-            DeleteRequest: {
-              Key: {
-                email: obfusticatedEmail,
-              },
+        [env.DYNAMO_USER_TABLE_NAME]: userRecords.Items.map(({ email }) => ({
+          DeleteRequest: {
+            Key: {
+              email,
             },
-          })
-        ),
+          },
+        })),
       },
     })
     .promise();
