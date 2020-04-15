@@ -19,9 +19,9 @@ export EXCLUDED_EMAILS="hello@mycorp.com.au"
 export ADMIN_EMAILS="elpresedente@mycorp.com.au"
 export MAX_VOTES="3"
 export WORKPLACE_NAME="My Corp"
+export OBFUSTICATION_PEPPER="QmAyxZJv6EM85EBW79aXPkt^N"
 
 export DYNAMO_USER_TABLE_NAME="PeoplesChoiceUserTable"
-export DYNAMO_LEDGER_TABLE_NAME="PeoplesChoiceLedgerTable"
 
 export AWS_ACCESS_KEY_ID_=SOME_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY_=SOME_SECRET_ACCESS_KEY

@@ -1,4 +1,4 @@
-import { cleanEnv, str, url, num } from "envalid";
+import { cleanEnv, num, str } from "envalid";
 
 export const env = cleanEnv(process.env, {
   // Trailing underscore gets around zeit reserved environment variable
@@ -15,5 +15,6 @@ export const env = cleanEnv(process.env, {
   ADMIN_EMAILS: str(),
   DYNAMO_USER_TABLE_NAME: str(),
   MAX_VOTES: num(),
-  WORKPLACE_NAME: str()
+  WORKPLACE_NAME: str(),
+  OBFUSTICATION_PEPPER: str(),
 });

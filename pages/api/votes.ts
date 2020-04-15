@@ -1,11 +1,9 @@
 import { NowRequest } from "@now/node";
-import { Credentials } from "google-auth-library/build/src/auth/credentials";
-import jwt from "jsonwebtoken";
 
 import dynamoClient from "../../utils/dynamo-client";
 import { env } from "../../utils/env";
-import { apiHandler } from "../../utils/handler";
-import { makeOAuthClient } from "../../utils/oauth-client";
+import { authenticatedApiHandler } from "../../utils/handler";
+import { obfusticateEmail } from "../../utils/obfusticate";
 import { ApiResponse, VotesResponse } from "../../utils/types";
 
 /**
@@ -18,12 +16,15 @@ const performVote = async (
   email: string,
   targetEmail: string
 ): Promise<ApiResponse<VotesResponse>> => {
-  console.log(`Getting user record for: [${email}]`);
+  const obfusticatedEmail = obfusticateEmail(email);
+
+  console.log(`Getting user record for: [${obfusticatedEmail}]`);
+
   const userRecord = await dynamoClient
     .get({
       TableName: env.DYNAMO_USER_TABLE_NAME,
       Key: {
-        email: email,
+        email: obfusticatedEmail,
       },
     })
     .promise();
@@ -40,13 +41,15 @@ const performVote = async (
     };
   }
 
-  console.log(`Appending vote for [${targetEmail}] for user [${email}]`);
+  console.log(
+    `Appending vote for [${targetEmail}] for user [${obfusticatedEmail}]`
+  );
 
   const updated = await dynamoClient
     .update({
       TableName: env.DYNAMO_USER_TABLE_NAME,
       Key: {
-        email: email,
+        email: obfusticatedEmail,
       },
       UpdateExpression: `set total_votes = if_not_exists(total_votes, :default_votes) + :vote_increment,
                              vote_targets = list_append(if_not_exists(vote_targets, :default_vote_targets), :vote_target)`,
@@ -64,7 +67,7 @@ const performVote = async (
     .promise();
 
   console.log(
-    `Updated vote count for [${email}] to [${updated.Attributes.total_votes}]`
+    `Updated vote count for [${obfusticatedEmail}] to [${updated.Attributes.total_votes}]`
   );
 
   return {
@@ -82,12 +85,14 @@ const performVote = async (
  * @param email the email of the user to get the votes for
  */
 const getVotes = async (email: string): Promise<ApiResponse<VotesResponse>> => {
-  console.log(`Getting user record for: [${email}]`);
+  const obfusticatedEmail = obfusticateEmail(email);
+
+  console.log(`Getting user record for: [${obfusticatedEmail}]`);
   const userRecord = await dynamoClient
     .get({
       TableName: env.DYNAMO_USER_TABLE_NAME,
       Key: {
-        email: email,
+        email: obfusticatedEmail,
       },
     })
     .promise();
@@ -107,42 +112,30 @@ const getVotes = async (email: string): Promise<ApiResponse<VotesResponse>> => {
 /**
  * API handler for operations on the Votes resource
  */
-export default apiHandler<VotesResponse>(async (req: NowRequest) => {
-  if (!req.cookies.jwt) {
-    return {
-      statusCode: 401,
-      body: { error: "Unauthorized" },
-    };
+export default authenticatedApiHandler<VotesResponse>(
+  async (req: NowRequest, userEmail: string) => {
+    if (req.method === "POST") {
+      const targetEmail = req.body.targetEmail;
+
+      if (typeof targetEmail !== "string") {
+        return {
+          statusCode: 400,
+          body: {
+            error: `Expected 'targetEmail' string param in body`,
+          },
+        };
+      }
+
+      return performVote(userEmail, targetEmail);
+    } else if (req.method === "GET") {
+      return getVotes(userEmail);
+    } else {
+      return {
+        statusCode: 400,
+        body: {
+          error: `Unsupported method [${req.method}]`,
+        },
+      };
+    }
   }
-
-  const oAuthClient = makeOAuthClient(req);
-  // eslint-disable-next-line functional/immutable-data
-  oAuthClient.credentials = jwt.verify(
-    req.cookies.jwt,
-    env.JWT_SECRET
-  ) as Credentials;
-
-  const targetEmail = req.body.targetEmail;
-
-  const decodedIdToken = jwt.decode(oAuthClient.credentials.id_token);
-  if (
-    decodedIdToken === null ||
-    typeof decodedIdToken !== "object" ||
-    typeof decodedIdToken.email !== "string"
-  ) {
-    throw new Error("Invalid ID token");
-  }
-
-  if (req.method === "POST") {
-    return performVote(decodedIdToken.email, targetEmail);
-  } else if (req.method === "GET") {
-    return getVotes(decodedIdToken.email);
-  } else {
-    return {
-      statusCode: 400,
-      body: {
-        error: `Unsupported method [${req.method}]`,
-      },
-    };
-  }
-});
+);

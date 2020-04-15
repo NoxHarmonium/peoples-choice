@@ -1,15 +1,9 @@
 import { NowRequest } from "@now/node";
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { admin_directory_v1, google } from "googleapis";
-import {
-  Credentials,
-  OAuth2Client,
-} from "googleapis/node_modules/google-auth-library";
-import jwt from "jsonwebtoken";
 
 import { env } from "../../utils/env";
-import { apiHandler } from "../../utils/handler";
-import { makeOAuthClient } from "../../utils/oauth-client";
+import { authenticatedApiHandler } from "../../utils/handler";
 import { ApiResponse, CandidatesResponse } from "../../utils/types";
 
 /**
@@ -20,13 +14,11 @@ import { ApiResponse, CandidatesResponse } from "../../utils/types";
 export const getCandidates = async (
   // eslint-disable-next-line @typescript-eslint/camelcase
   directoryApi: admin_directory_v1.Admin,
-  excludedEmails: readonly string[],
-  oAuthClient: OAuth2Client
+  excludedEmails: readonly string[]
 ): Promise<ApiResponse<CandidatesResponse>> => {
   const {
     data: { users },
   } = await directoryApi.users.list({
-    auth: oAuthClient,
     domain: env.DIRECTORY_DOMAIN,
     maxResults: 500,
     viewType: "domain_public",
@@ -58,36 +50,23 @@ export const getCandidates = async (
 /**
  * API handler for operations on the Candidate resource
  */
-export default apiHandler<CandidatesResponse>(async (req: NowRequest) => {
-  if (!req.cookies.jwt) {
-    return {
-      statusCode: 401,
-      body: { error: "Unauthorized" },
-    };
+export default authenticatedApiHandler<CandidatesResponse>(
+  async (req: NowRequest) => {
+    const directoryApi = google.admin({
+      version: "directory_v1",
+    });
+
+    const excludedEmails = env.EXCLUDED_EMAILS.split(",");
+
+    if (req.method === "GET") {
+      return getCandidates(directoryApi, excludedEmails);
+    } else {
+      return {
+        statusCode: 400,
+        body: {
+          error: `Unsupported method [${req.method}]`,
+        },
+      };
+    }
   }
-
-  const oAuthClient = makeOAuthClient(req);
-
-  // eslint-disable-next-line functional/immutable-data
-  oAuthClient.credentials = jwt.verify(
-    req.cookies.jwt,
-    env.JWT_SECRET
-  ) as Credentials;
-
-  const directoryApi = google.admin({
-    version: "directory_v1",
-  });
-
-  const excludedEmails = env.EXCLUDED_EMAILS.split(",");
-
-  if (req.method === "GET") {
-    return getCandidates(directoryApi, excludedEmails, oAuthClient);
-  } else {
-    return {
-      statusCode: 400,
-      body: {
-        error: `Unsupported method [${req.method}]`,
-      },
-    };
-  }
-});
+);

@@ -1,11 +1,8 @@
 import { NowRequest } from "@now/node";
-import { Credentials } from "google-auth-library/build/src/auth/credentials";
-import jwt from "jsonwebtoken";
 
 import dynamoClient from "../../utils/dynamo-client";
 import { env } from "../../utils/env";
-import { apiHandler } from "../../utils/handler";
-import { makeOAuthClient } from "../../utils/oauth-client";
+import { authenticatedApiHandler } from "../../utils/handler";
 import { ApiResponse } from "../../utils/types";
 
 /**
@@ -27,13 +24,15 @@ const postReset = async (): Promise<ApiResponse<void>> => {
   await dynamoClient
     .batchWrite({
       RequestItems: {
-        [env.DYNAMO_USER_TABLE_NAME]: userRecords.Items.map(({ email }) => ({
-          DeleteRequest: {
-            Key: {
-              email,
+        [env.DYNAMO_USER_TABLE_NAME]: userRecords.Items.map(
+          ({ obfusticatedEmail }) => ({
+            DeleteRequest: {
+              Key: {
+                email: obfusticatedEmail,
+              },
             },
-          },
-        })),
+          })
+        ),
       },
     })
     .promise();
@@ -46,47 +45,25 @@ const postReset = async (): Promise<ApiResponse<void>> => {
 /**
  * API handler for operations on the Votes resource
  */
-export default apiHandler<void>(async (req: NowRequest) => {
-  if (!req.cookies.jwt) {
-    return {
-      statusCode: 401,
-      body: { error: "Unauthorized" },
-    };
+export default authenticatedApiHandler<void>(
+  async (req: NowRequest, userEmail: string) => {
+    const adminEmails = env.ADMIN_EMAILS.split(",");
+    if (!adminEmails.includes(userEmail)) {
+      return {
+        statusCode: 403,
+        body: { error: "Forbidden" },
+      };
+    }
+
+    if (req.method === "POST") {
+      return postReset();
+    } else {
+      return {
+        statusCode: 400,
+        body: {
+          error: `Unsupported method [${req.method}]`,
+        },
+      };
+    }
   }
-
-  const oAuthClient = makeOAuthClient(req);
-
-  // eslint-disable-next-line functional/immutable-data
-  oAuthClient.credentials = jwt.verify(
-    req.cookies.jwt,
-    env.JWT_SECRET
-  ) as Credentials;
-
-  const decodedIdToken = jwt.decode(oAuthClient.credentials.id_token);
-  if (
-    decodedIdToken === null ||
-    typeof decodedIdToken !== "object" ||
-    typeof decodedIdToken.email !== "string"
-  ) {
-    throw new Error("Invalid ID token");
-  }
-
-  const adminEmails = env.ADMIN_EMAILS.split(",");
-  if (!adminEmails.includes(decodedIdToken.email)) {
-    return {
-      statusCode: 403,
-      body: { error: "Forbidden" },
-    };
-  }
-
-  if (req.method === "POST") {
-    return postReset();
-  } else {
-    return {
-      statusCode: 400,
-      body: {
-        error: `Unsupported method [${req.method}]`,
-      },
-    };
-  }
-});
+);

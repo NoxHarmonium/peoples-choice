@@ -1,12 +1,9 @@
 import { NowRequest } from "@now/node";
-import { Credentials } from "google-auth-library/build/src/auth/credentials";
-import jwt from "jsonwebtoken";
 import { countBy, sortBy, toPairs, update } from "lodash";
 
 import dynamoClient from "../../utils/dynamo-client";
 import { env } from "../../utils/env";
-import { apiHandler } from "../../utils/handler";
-import { makeOAuthClient } from "../../utils/oauth-client";
+import { authenticatedApiHandler } from "../../utils/handler";
 import { ApiResponse, TallyResponse } from "../../utils/types";
 
 /**
@@ -53,46 +50,25 @@ const getTally = async (): Promise<ApiResponse<TallyResponse>> => {
 /**
  * API handler for operations on the Votes resource
  */
-export default apiHandler<TallyResponse>(async (req: NowRequest) => {
-  if (!req.cookies.jwt) {
-    return {
-      statusCode: 401,
-      body: { error: "Unauthorized" },
-    };
-  }
+export default authenticatedApiHandler<TallyResponse>(
+  async (req: NowRequest, userEmail: string) => {
+    const adminEmails = env.ADMIN_EMAILS.split(",");
+    if (!adminEmails.includes(userEmail)) {
+      return {
+        statusCode: 403,
+        body: { error: "Forbidden" },
+      };
+    }
 
-  const oAuthClient = makeOAuthClient(req);
-  // eslint-disable-next-line functional/immutable-data
-  oAuthClient.credentials = jwt.verify(
-    req.cookies.jwt,
-    env.JWT_SECRET
-  ) as Credentials;
-
-  const decodedIdToken = jwt.decode(oAuthClient.credentials.id_token);
-  if (
-    decodedIdToken === null ||
-    typeof decodedIdToken !== "object" ||
-    typeof decodedIdToken.email !== "string"
-  ) {
-    throw new Error("Invalid ID token");
+    if (req.method === "GET") {
+      return getTally();
+    } else {
+      return {
+        statusCode: 400,
+        body: {
+          error: `Unsupported method [${req.method}]`,
+        },
+      };
+    }
   }
-
-  const adminEmails = env.ADMIN_EMAILS.split(",");
-  if (!adminEmails.includes(decodedIdToken.email)) {
-    return {
-      statusCode: 403,
-      body: { error: "Forbidden" },
-    };
-  }
-
-  if (req.method === "GET") {
-    return getTally();
-  } else {
-    return {
-      statusCode: 400,
-      body: {
-        error: `Unsupported method [${req.method}]`,
-      },
-    };
-  }
-});
+);
