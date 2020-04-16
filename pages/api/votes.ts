@@ -81,6 +81,82 @@ const performVote = async (
 };
 
 /**
+ * Removes a vote
+ *
+ * @param email the email of the user removing the vote
+ * @param targetEmail the email of the user the vote is for
+ */
+const removeVote = async (
+  email: string,
+  targetEmail: string
+): Promise<ApiResponse<VotesResponse>> => {
+  const obfusticatedEmail = obfusticateEmail(email);
+
+  console.log(`Getting user record for: [${obfusticatedEmail}]`);
+
+  const userRecord = await dynamoClient
+    .get({
+      TableName: env.DYNAMO_USER_TABLE_NAME,
+      Key: {
+        email: obfusticatedEmail,
+      },
+    })
+    .promise();
+
+  const totalVotes: number =
+    userRecord.Item === undefined ? 0 : userRecord.Item["total_votes"];
+
+  if (totalVotes <= 0) {
+    return {
+      statusCode: 400,
+      body: {
+        error: `You have no votes to remove`,
+      },
+    };
+  }
+
+  console.log(
+    `Removing vote for [${targetEmail}] for user [${obfusticatedEmail}]`
+  );
+
+  const currentVotes: ReadonlyArray<string> = userRecord.Item.vote_targets;
+  const indexOfVoteToRemove = currentVotes.indexOf(targetEmail);
+
+  const updated = await dynamoClient
+    .update({
+      TableName: env.DYNAMO_USER_TABLE_NAME,
+      Key: {
+        email: obfusticatedEmail,
+      },
+      UpdateExpression: `set total_votes = total_votes - :vote_increment
+                         remove vote_targets[${indexOfVoteToRemove}]`,
+      // Ensure that the value in the database hasn't changed since we read the record
+      // Thanks: https://medium.com/hackernoon/safe-list-updates-with-dynamodb-adc44f2e7d3
+      ConditionExpression: `total_votes > :zero AND vote_targets[${indexOfVoteToRemove}] = :vote_target`,
+      ExpressionAttributeValues: {
+        ":vote_increment": 1,
+        ":vote_target": targetEmail,
+        ":zero": 0,
+      },
+      ReturnValues: "UPDATED_NEW",
+    })
+    .promise();
+
+  console.log(
+    `Updated vote count for [${obfusticatedEmail}] to [${updated.Attributes.total_votes}]`
+  );
+
+  return {
+    statusCode: 200,
+    body: {
+      votesRemaining:
+        env.MAX_VOTES - (updated.Attributes.total_votes as number),
+      votes: updated.Attributes.vote_targets as readonly string[],
+    },
+  };
+};
+
+/**
  * Gets a list of votes that have been submitted by a user
  * @param email the email of the user to get the votes for
  */
@@ -114,7 +190,7 @@ const getVotes = async (email: string): Promise<ApiResponse<VotesResponse>> => {
  */
 export default authenticatedApiHandler<VotesResponse>(
   async (req: NowRequest, userEmail: string) => {
-    if (req.method === "POST") {
+    if (req.method === "POST" || req.method === "DELETE") {
       const targetEmail = req.body.targetEmail;
 
       if (typeof targetEmail !== "string") {
@@ -126,7 +202,11 @@ export default authenticatedApiHandler<VotesResponse>(
         };
       }
 
-      return performVote(userEmail, targetEmail);
+      if (req.method === "POST") {
+        return performVote(userEmail, targetEmail);
+      } else if (req.method === "DELETE") {
+        return removeVote(userEmail, targetEmail);
+      }
     } else if (req.method === "GET") {
       return getVotes(userEmail);
     } else {

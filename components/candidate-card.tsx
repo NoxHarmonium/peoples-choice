@@ -1,13 +1,18 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import {
+  Button,
   Card,
   CardActionArea,
   CardContent,
   CardMedia,
   Grid,
   Grow,
+  IconButton,
+  Snackbar,
   Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import CloseIcon from "@material-ui/icons/Close";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import clsx from "clsx";
 import fetch from "isomorphic-unfetch";
@@ -74,6 +79,7 @@ export const CandidateCard = ({
       }
   >(undefined);
   const [submittingVote, setSubmittingVote] = useState(false);
+  const [undoShown, setUndoShown] = useState(false);
 
   const voteCount = votes.filter((v) => v === candidate.primaryEmail).length;
   const hasBeenVotedFor = voteCount > 0;
@@ -103,6 +109,7 @@ export const CandidateCard = ({
         }
         setVotes([...votes, candidate.primaryEmail]);
         setVotesRemaining(votesRemaining - 1);
+        setUndoShown(true);
 
         if (reward !== undefined) {
           reward.rewardMe();
@@ -118,59 +125,135 @@ export const CandidateCard = ({
     votesRemaining,
     submittingVote,
     setVotesRemaining,
+    setUndoShown,
   ]);
+
+  const onUndoVote = useCallback(() => {
+    setUndoShown(false);
+
+    if (submittingVote) {
+      console.warn(
+        "You are already undoing the last vote. This one will be ignored. Take your time, there's no rush."
+      );
+      return;
+    }
+
+    setSubmittingVote(true);
+    fetch("/api/votes", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        targetEmail: candidate.primaryEmail,
+      }),
+    })
+      .then((resp) => {
+        if (!resp.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const votesCopy = [...votes];
+        const voteIndex = votes.indexOf(candidate.primaryEmail);
+        // eslint-disable-next-line functional/immutable-data
+        votesCopy.splice(voteIndex, 1);
+        setVotes(votesCopy);
+        setVotesRemaining(votesRemaining + 1);
+        setUndoShown(false);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setSubmittingVote(false));
+  }, [
+    candidate,
+    votes,
+    setVotes,
+    votesRemaining,
+    submittingVote,
+    setVotesRemaining,
+    setUndoShown,
+  ]);
+
+  const closeUndo = useCallback(() => {
+    setUndoShown(false);
+  }, [setUndoShown]);
 
   // TODO: Does the Grow animation still occur with reduce motion on?
   return (
-    <Grid item xs={12} md={3} key={index} className={classes.root}>
-      <Grow in={true}>
-        <Reward
-          ref={(ref) => {
-            setReward(ref);
-          }}
-          type="emoji"
-        >
-          <Card
-            className={hasBeenVotedFor ? classes.voted : ""}
-            onClick={onVote}
-          >
-            <CardActionArea
-              className={clsx({
-                [classes.cardActionArea]: true,
-                [classes.disabledActionArea]: locked || submittingVote,
-              })}
+    <>
+      <Snackbar
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        open={undoShown}
+        autoHideDuration={20000}
+        onClose={closeUndo}
+        message="Vote Submitted"
+        action={
+          <>
+            <Button color="secondary" size="small" onClick={onUndoVote}>
+              UNDO
+            </Button>
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={closeUndo}
             >
-              <CardMedia
-                className={classes.media}
-                image={
-                  candidate.thumbnailPhotoUrl ?? "/placeholder-portrait.png"
-                }
-                title={`Portrait of ${candidate.name.fullName}`}
-              />
-              <CardContent className={classes.content}>
-                <Typography variant="h6" style={{ marginBottom: "1rem" }}>
-                  {candidate.name.fullName}
-                </Typography>
-                <Typography>
-                  {votesRemaining === 0
-                    ? "Thanks for voting"
-                    : voteCount > 0
-                    ? "Click to Vote again!"
-                    : "Click to Vote!"}
-                </Typography>
-                <div style={{ minHeight: "2rem" }}>
-                  {Array.from({ length: voteCount }, (_, index) => (
-                    <span key={index}>
-                      <ThumbUpIcon />
-                      {"  "}
-                    </span>
-                  ))}
-                </div>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Reward>
-      </Grow>
-    </Grid>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </>
+        }
+      />
+      <Grid item xs={12} md={3} key={index} className={classes.root}>
+        <Grow in={true}>
+          <Reward
+            ref={(ref) => {
+              setReward(ref);
+            }}
+            type="emoji"
+          >
+            <Card
+              className={hasBeenVotedFor ? classes.voted : ""}
+              onClick={onVote}
+            >
+              <CardActionArea
+                className={clsx({
+                  [classes.cardActionArea]: true,
+                  [classes.disabledActionArea]: locked || submittingVote,
+                })}
+              >
+                <CardMedia
+                  className={classes.media}
+                  image={
+                    candidate.thumbnailPhotoUrl ?? "/placeholder-portrait.png"
+                  }
+                  title={`Portrait of ${candidate.name.fullName}`}
+                />
+                <CardContent className={classes.content}>
+                  <Typography variant="h6" style={{ marginBottom: "1rem" }}>
+                    {candidate.name.fullName}
+                  </Typography>
+                  <Typography>
+                    {votesRemaining === 0
+                      ? "Thanks for voting"
+                      : voteCount > 0
+                      ? "Click to Vote again!"
+                      : "Click to Vote!"}
+                  </Typography>
+                  <div style={{ minHeight: "2rem" }}>
+                    {Array.from({ length: voteCount }, (_, index) => (
+                      <span key={index}>
+                        <ThumbUpIcon />
+                        {"  "}
+                      </span>
+                    ))}
+                  </div>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          </Reward>
+        </Grow>
+      </Grid>
+    </>
   );
 };
