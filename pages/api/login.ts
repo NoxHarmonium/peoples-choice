@@ -16,6 +16,7 @@ export default apiHandler(async (req: NowRequest) => {
     scope:
       "https://www.googleapis.com/auth/admin.directory.user.readonly email",
     hd: env.DIRECTORY_DOMAIN,
+    prompt: "consent",
   });
 
   return {

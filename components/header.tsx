@@ -1,7 +1,7 @@
-import { AppBar, makeStyles,Toolbar } from "@material-ui/core";
+import { AppBar, Link, makeStyles, Toolbar } from "@material-ui/core";
 import React from "react";
 
-import Typography from "./typography";
+import { useTypedSelector } from "../state/store";
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -39,19 +39,21 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const Header = ({ votesRemaining }: { readonly votesRemaining?: number }) => {
+export const Header = () => {
   const classes = useStyles();
+  const { loading, votesRemaining } = useTypedSelector(
+    ({ votesViewModel }) => votesViewModel
+  );
+
   return (
     <AppBar position="fixed" elevation={0} className={classes.root}>
       <Toolbar className={classes.toolbar}>
         <div className={classes.left} />
-        <Typography variant="h6" className={classes.title}>
+        <Link variant="h6" className={classes.title} href="/">
           People's Choice Awards
-        </Typography>
+        </Link>
         <div className={classes.right}>
-          {votesRemaining === undefined
-            ? undefined
-            : `${votesRemaining} Votes Remaining`}
+          {loading ? undefined : `${votesRemaining} Votes Remaining`}
         </div>
       </Toolbar>
     </AppBar>

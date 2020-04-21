@@ -15,11 +15,16 @@ import { makeStyles } from "@material-ui/core/styles";
 import CloseIcon from "@material-ui/icons/Close";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import clsx from "clsx";
-import fetch from "isomorphic-unfetch";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import Reward from "react-rewards";
 
-import { Candidate, Votes } from "../utils/types";
+import {
+  performOptimisticVote,
+  undoOptimisticVote,
+  useTypedSelector,
+} from "../state";
+import { Candidate } from "../utils/types";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -58,17 +63,9 @@ const useStyles = makeStyles((theme) => ({
 
 export const CandidateCard = ({
   candidate,
-  votes,
-  votesRemaining,
-  setVotes,
-  setVotesRemaining,
   index,
 }: {
   readonly candidate: Candidate;
-  readonly votes: Votes;
-  readonly votesRemaining: number;
-  readonly setVotes: (votes: Votes) => void;
-  readonly setVotesRemaining: (votesRemaining: number) => void;
   readonly index: number;
 }) => {
   const classes = useStyles();
@@ -78,99 +75,35 @@ export const CandidateCard = ({
         readonly rewardMe: () => void;
       }
   >(undefined);
-  const [submittingVote, setSubmittingVote] = useState(false);
   const [undoShown, setUndoShown] = useState(false);
+  const {
+    loading,
+    votes,
+    votesRemaining,
+    lastSuccessfulVote,
+  } = useTypedSelector(({ votesViewModel }) => votesViewModel);
 
   const voteCount = votes.filter((v) => v === candidate.primaryEmail).length;
-  const hasBeenVotedFor = voteCount > 0;
-  const locked = votesRemaining === 0;
 
-  const onVote = useCallback(() => {
-    if (submittingVote) {
-      console.warn(
-        "You are already submitting the last vote. This one will be ignored. Take your time, there's no rush."
-      );
-      return;
+  const hasBeenVotedFor = voteCount > 0;
+  const locked = votesRemaining <= 0;
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    setUndoShown(lastSuccessfulVote === candidate.primaryEmail);
+  }, [lastSuccessfulVote, candidate]);
+
+  const onPerformVote = useCallback(() => {
+    if (reward !== undefined) {
+      reward.rewardMe();
     }
 
-    setSubmittingVote(true);
-    fetch("/api/votes", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        targetEmail: candidate.primaryEmail,
-      }),
-    })
-      .then((resp) => {
-        if (!resp.ok) {
-          throw new Error("Network response was not ok");
-        }
-        setVotes([...votes, candidate.primaryEmail]);
-        setVotesRemaining(votesRemaining - 1);
-        setUndoShown(true);
-
-        if (reward !== undefined) {
-          reward.rewardMe();
-        }
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setSubmittingVote(false));
-  }, [
-    candidate,
-    votes,
-    setVotes,
-    reward,
-    votesRemaining,
-    submittingVote,
-    setVotesRemaining,
-    setUndoShown,
-  ]);
+    dispatch(performOptimisticVote(candidate.primaryEmail));
+  }, [candidate, reward, dispatch]);
 
   const onUndoVote = useCallback(() => {
-    setUndoShown(false);
-
-    if (submittingVote) {
-      console.warn(
-        "You are already undoing the last vote. This one will be ignored. Take your time, there's no rush."
-      );
-      return;
-    }
-
-    setSubmittingVote(true);
-    fetch("/api/votes", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        targetEmail: candidate.primaryEmail,
-      }),
-    })
-      .then((resp) => {
-        if (!resp.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const votesCopy = [...votes];
-        const voteIndex = votes.indexOf(candidate.primaryEmail);
-        // eslint-disable-next-line functional/immutable-data
-        votesCopy.splice(voteIndex, 1);
-        setVotes(votesCopy);
-        setVotesRemaining(votesRemaining + 1);
-        setUndoShown(false);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setSubmittingVote(false));
-  }, [
-    candidate,
-    votes,
-    setVotes,
-    votesRemaining,
-    submittingVote,
-    setVotesRemaining,
-    setUndoShown,
-  ]);
+    dispatch(undoOptimisticVote(candidate.primaryEmail));
+  }, [candidate, dispatch]);
 
   const closeUndo = useCallback(() => {
     setUndoShown(false);
@@ -212,15 +145,13 @@ export const CandidateCard = ({
             }}
             type="emoji"
           >
-            <Card
-              className={hasBeenVotedFor ? classes.voted : ""}
-              onClick={onVote}
-            >
+            <Card className={hasBeenVotedFor ? classes.voted : ""}>
               <CardActionArea
                 className={clsx({
                   [classes.cardActionArea]: true,
-                  [classes.disabledActionArea]: locked || submittingVote,
                 })}
+                disabled={locked || loading}
+                onClick={onPerformVote}
               >
                 <CardMedia
                   className={classes.media}

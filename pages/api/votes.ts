@@ -122,6 +122,15 @@ const removeVote = async (
   const currentVotes: ReadonlyArray<string> = userRecord.Item.vote_targets;
   const indexOfVoteToRemove = currentVotes.indexOf(targetEmail);
 
+  if (indexOfVoteToRemove === -1) {
+    return {
+      statusCode: 400,
+      body: {
+        error: `Cannot remove non-existant vote`,
+      },
+    };
+  }
+
   const updated = await dynamoClient
     .update({
       TableName: env.DYNAMO_USER_TABLE_NAME,
