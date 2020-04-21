@@ -28,11 +28,6 @@ export AWS_SECRET_ACCESS_KEY_=SOME_SECRET_ACCESS_KEY
 export AWS_REGION_=ap-southeast-2
 ```
 
-## TODO
-
-- Obfuscate votes
-- Clean up very rough code (add linting etc.)
-
 ## Thanks
 
 - Theming shamelessly copied and modified from: https://github.com/mui-org/material-ui/blob/master/docs/src/pages/premium-themes/onepirate
