@@ -36,14 +36,6 @@ const makeStore: MakeStore = (initialState: RootState) => {
 };
 
 class MyApp extends App<ReduxWrapperAppProps<RootState>> {
-  static async getInitialProps({ Component, ctx }: AppContext) {
-    const pageProps = Component.getInitialProps
-      ? await Component.getInitialProps(ctx)
-      : {};
-
-    return { pageProps };
-  }
-
   render() {
     const { Component, pageProps, store } = this.props;
     return (
