@@ -13,5 +13,6 @@
     "WORKPLACE_NAME": "Agile Digital",
     "DYNAMO_USER_TABLE_NAME": "AgilePeoplesChoiceUserTable",
     "OBFUSTICATION_PEPPER": "@obfustication_pepper"
-  }
+  },
+  "regions": ["syd1"]
 }
