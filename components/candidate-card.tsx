@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/cognitive-complexity */
 import {
   Button,
   Card,
@@ -14,7 +13,6 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 import CloseIcon from "@material-ui/icons/Close";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
-import clsx from "clsx";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import Reward from "react-rewards";
@@ -59,6 +57,12 @@ const useStyles = makeStyles((theme) => ({
       opacity: 0,
     },
   },
+  thumbsPanel: {
+    minHeight: "2rem",
+  },
+  nameTitle: {
+    marginBottom: "1rem",
+  },
 }));
 
 export const CandidateCard = ({
@@ -69,6 +73,8 @@ export const CandidateCard = ({
   readonly index: number;
 }) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+
   const [reward, setReward] = useState<
     | undefined
     | {
@@ -87,7 +93,7 @@ export const CandidateCard = ({
 
   const hasBeenVotedFor = voteCount > 0;
   const locked = votesRemaining <= 0;
-  const dispatch = useDispatch();
+  const votingDisabled = locked || loading;
 
   useEffect(() => {
     setUndoShown(lastSuccessfulVote === candidate.primaryEmail);
@@ -147,10 +153,8 @@ export const CandidateCard = ({
           >
             <Card className={hasBeenVotedFor ? classes.voted : ""}>
               <CardActionArea
-                className={clsx({
-                  [classes.cardActionArea]: true,
-                })}
-                disabled={locked || loading}
+                className={classes.cardActionArea}
+                disabled={votingDisabled}
                 onClick={onPerformVote}
               >
                 <CardMedia
@@ -161,7 +165,7 @@ export const CandidateCard = ({
                   title={`Portrait of ${candidate.name.fullName}`}
                 />
                 <CardContent className={classes.content}>
-                  <Typography variant="h6" style={{ marginBottom: "1rem" }}>
+                  <Typography variant="h6" className={classes.nameTitle}>
                     {candidate.name.fullName}
                   </Typography>
                   <Typography>
@@ -171,7 +175,7 @@ export const CandidateCard = ({
                       ? "Click to Vote again!"
                       : "Click to Vote!"}
                   </Typography>
-                  <div style={{ minHeight: "2rem" }}>
+                  <div className={classes.thumbsPanel}>
                     {Array.from({ length: voteCount }, (_, index) => (
                       <span key={index}>
                         <ThumbUpIcon />

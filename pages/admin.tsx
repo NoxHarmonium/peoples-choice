@@ -1,5 +1,14 @@
-import { CircularProgress,makeStyles } from "@material-ui/core";
-import React, { useCallback,useEffect, useState } from "react";
+import {
+  CircularProgress,
+  makeStyles,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+} from "@material-ui/core";
+import React, { useCallback, useEffect, useState } from "react";
 
 import CustomButton from "../components/custom-button";
 import { Header } from "../components/header";
@@ -22,6 +31,7 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [tally, setTally] = useState<ReadonlyArray<TallyEntry>>([]);
   const [error, setError] = useState<string | undefined>();
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -58,7 +68,15 @@ const Admin = () => {
     loadData();
   }, []);
 
-  const resetOnClick = useCallback(() => {
+  const onReset = useCallback(() => {
+    setConfirmationOpen(true);
+  }, []);
+
+  const onCancel = useCallback(() => {
+    setConfirmationOpen(false);
+  }, []);
+
+  const onConfirm = useCallback(() => {
     const doReset = async () => {
       const resetResponse = await fetch("/api/reset", {
         method: "POST",
@@ -77,6 +95,7 @@ const Admin = () => {
       location.reload();
     };
     doReset();
+    setConfirmationOpen(false);
   }, []);
 
   const MainSection = () => (
@@ -93,15 +112,42 @@ const Admin = () => {
         color="secondary"
         variant="contained"
         size="large"
-        onClick={resetOnClick}
+        onClick={onReset}
       >
         Reset All Votes
       </CustomButton>
     </>
   );
 
+  const ConfirmationDialog = () => (
+    <div>
+      <Dialog
+        open={confirmationOpen}
+        onClose={onCancel}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Reset Tally</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete all votes?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={onConfirm} color="primary" autoFocus>
+            Ok
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+
   return (
     <>
+      <ConfirmationDialog />
       <Header />
       {loading ? (
         <div className={classes.loadingContainer}>
