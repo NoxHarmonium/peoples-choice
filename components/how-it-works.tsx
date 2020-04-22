@@ -1,17 +1,17 @@
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
-import { EmojiEvents,HowToReg, HowToVote } from "@material-ui/icons";
+import { EmojiEvents, HowToReg, HowToVote } from "@material-ui/icons";
 import React from "react";
 
 import Button from "./custom-button";
 import Typography from "./typography";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     backgroundColor: theme.palette.common.white,
-    overflow: "hidden"
+    overflow: "hidden",
   },
   container: {
     marginTop: theme.spacing(10),
@@ -19,42 +19,42 @@ const useStyles = makeStyles(theme => ({
     position: "relative",
     display: "flex",
     flexDirection: "column",
-    alignItems: "center"
+    alignItems: "center",
   },
   item: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: theme.spacing(0, 5)
+    padding: theme.spacing(0, 5),
   },
   title: {
-    marginBottom: theme.spacing(14)
+    marginBottom: theme.spacing(14),
   },
   number: {
     fontSize: 24,
     fontFamily: theme.typography.fontFamily,
     color: theme.palette.secondary.main,
-    fontWeight: theme.typography.fontWeightMedium
+    fontWeight: theme.typography.fontWeightMedium,
   },
   image: {
     height: 55,
     marginTop: theme.spacing(4),
-    marginBottom: theme.spacing(4)
+    marginBottom: theme.spacing(4),
   },
   curvyLines: {
     pointerEvents: "none",
     position: "absolute",
     top: -180,
-    opacity: 0.7
+    opacity: 0.7,
   },
   button: {
-    marginTop: theme.spacing(8)
+    marginTop: theme.spacing(8),
   },
   icons: {
     fontSize: 70,
     color: theme.palette.common.black,
-    margin: theme.spacing(5)
-  }
+    margin: theme.spacing(5),
+  },
 }));
 
 function ProductHowItWorks(props) {
@@ -68,12 +68,7 @@ function ProductHowItWorks(props) {
           className={classes.curvyLines}
           alt="curvy lines"
         />
-        <Typography
-          variant="h4"
-          marked="center"
-          className={classes.title}
-          //   component="h2"
-        >
+        <Typography variant="h4" marked="center" className={classes.title}>
           How it works
         </Typography>
         <div>
@@ -113,8 +108,7 @@ function ProductHowItWorks(props) {
           size="large"
           variant="contained"
           className={classes.button}
-          //   component="a"
-          href="/api/login"
+          href="/vote"
         >
           Get started
         </Button>

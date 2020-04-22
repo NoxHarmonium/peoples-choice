@@ -50,9 +50,9 @@ function ProductHero() {
         size="large"
         className={classes.button}
         // component="a"
-        href="/api/login"
+        href="/vote"
       >
-        Log In and Vote!
+        Start Voting!
       </CustomButton>
       <Typography variant="body2" color="inherit" className={classes.more}>
         Use your corporate Google account
