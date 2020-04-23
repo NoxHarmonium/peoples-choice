@@ -2,11 +2,11 @@ import { TypedUseSelectorHook, useSelector } from "react-redux";
 import { combineReducers } from "redux";
 
 import { candidatesCrudReducer } from "./candidates";
-import { votesViewModelReducer } from "./votes";
+import { votesReducer } from "./votes";
 
 export const rootReducer = combineReducers({
   ...candidatesCrudReducer,
-  votesViewModel: votesViewModelReducer,
+  votes: votesReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

@@ -8,6 +8,12 @@ Hot reload for local development:
 $ yarn dev
 ```
 
+To analyse build size:
+
+```
+$ ANALYZE=true yarn build
+```
+
 ## Environment Variables
 
 ```

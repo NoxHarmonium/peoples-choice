@@ -7,8 +7,8 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "lint-fix": "eslint components pages --ext .ts,.tsx --fix",
-    "lint": "eslint components pages --ext .ts,.tsx --max-warnings=0"
+    "lint-fix": "eslint components pages state utils --ext .ts,.tsx --fix",
+    "lint": "eslint components pages state utils --ext .ts,.tsx --max-warnings=0"
   },
   "keywords": [],
   "author": "",
@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "@material-ui/icons": "^4.9.1",
+    "@next/bundle-analyzer": "^9.3.5",
     "@types/flux-standard-action": "^1.1.0",
     "@types/jsonwebtoken": "^8.3.8",
     "@types/knuth-shuffle": "^1.0.0",

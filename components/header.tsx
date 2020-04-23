@@ -41,9 +41,7 @@ const useStyles = makeStyles((theme) => ({
 
 export const Header = () => {
   const classes = useStyles();
-  const { loading, votesRemaining } = useTypedSelector(
-    ({ votesViewModel }) => votesViewModel
-  );
+  const { loading, votesRemaining } = useTypedSelector(({ votes }) => votes);
 
   return (
     <AppBar position="fixed" elevation={0} className={classes.root}>

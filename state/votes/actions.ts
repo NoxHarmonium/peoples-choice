@@ -1,13 +1,14 @@
 import { FluxStandardAction } from "flux-standard-action";
 
-export type VotesViewModel = {
+export type VotesState = {
   readonly votesRemaining: number;
   readonly votes: ReadonlyArray<string>;
   readonly loading: boolean;
   readonly lastSuccessfulVote?: string;
+  readonly error?: Error;
 };
 
-export type VotesViewModelActionTypes =
+export type VotesActionTypes =
   | "ADD_VOTE"
   | "REMOVE_VOTE"
   | "UPDATE_DATA"
@@ -30,7 +31,7 @@ export type RemoveVoteAction = FluxStandardAction<
 
 export type UpdateDataAction = FluxStandardAction<
   "UPDATE_DATA",
-  Partial<VotesViewModel>
+  Partial<VotesState>
 >;
 
 export type PerformSyncAction = FluxStandardAction<"PERFORM_SYNC", {}>;
@@ -48,6 +49,35 @@ export type UndoOptimisticVoteAction = FluxStandardAction<
     readonly targetEmail: string;
   }
 >;
+
+export type VoteAction =
+  | AddVoteAction
+  | RemoveVoteAction
+  | UpdateDataAction
+  | PerformSyncAction
+  | PerformOptimisticVoteAction
+  | UndoOptimisticVoteAction;
+
+export const addVote = (targetEmail: string): AddVoteAction => ({
+  type: "ADD_VOTE",
+  payload: {
+    targetEmail,
+  },
+});
+
+export const removeVote = (targetEmail: string): RemoveVoteAction => ({
+  type: "REMOVE_VOTE",
+  payload: {
+    targetEmail,
+  },
+});
+
+export const updateData = (
+  partialState: Partial<VotesState>
+): UpdateDataAction => ({
+  type: "UPDATE_DATA",
+  payload: partialState,
+});
 
 export const performSync = (): PerformSyncAction => ({
   type: "PERFORM_SYNC",

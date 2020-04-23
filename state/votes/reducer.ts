@@ -1,21 +1,15 @@
-import {
-  AddVoteAction,
-  RemoveVoteAction,
-  UpdateDataAction,
-  VotesViewModel,
-} from ".";
+import { VoteAction, VotesState } from ".";
 
-const defaultState: VotesViewModel = {
+const defaultState: VotesState = {
   votesRemaining: 0,
   votes: [],
   loading: true,
 };
 
-export const votesViewModelReducer = (
-  state: VotesViewModel = defaultState,
-  action: AddVoteAction | RemoveVoteAction | UpdateDataAction
-): VotesViewModel => {
-  // eslint-disable-next-line sonarjs/no-small-switch
+export const votesReducer = (
+  state: VotesState = defaultState,
+  action: VoteAction
+): VotesState => {
   switch (action.type) {
     case "ADD_VOTE":
       return {

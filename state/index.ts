@@ -10,6 +10,15 @@ export const checkResponse = (response: Response) => {
   }
 };
 
+export const wrapError = (possibleError: unknown): Error => {
+  if (possibleError instanceof Error) {
+    return possibleError;
+  }
+  return new Error(
+    `An a non error type was thrown: [${JSON.stringify(possibleError)}]`
+  );
+};
+
 export * from "./candidates";
 export * from "./store";
 export * from "./votes";

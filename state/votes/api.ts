@@ -3,7 +3,7 @@ import { VotesResponse } from "../../utils/types";
 
 const url = "/api/votes";
 
-export const listVotes = async (): Promise<VotesResponse> => {
+const listVotes = async (): Promise<VotesResponse> => {
   const response = await fetch(url);
 
   checkResponse(response);
@@ -11,9 +11,7 @@ export const listVotes = async (): Promise<VotesResponse> => {
   return response.json() as Promise<VotesResponse>;
 };
 
-export const createVote = async (
-  targetEmail: string
-): Promise<VotesResponse> => {
+const createVote = async (targetEmail: string): Promise<VotesResponse> => {
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -29,9 +27,7 @@ export const createVote = async (
   return response.json() as Promise<VotesResponse>;
 };
 
-export const deleteVote = async (
-  targetEmail: string
-): Promise<VotesResponse> => {
+const deleteVote = async (targetEmail: string): Promise<VotesResponse> => {
   const response = await fetch(url, {
     method: "DELETE",
     headers: {
@@ -46,3 +42,11 @@ export const deleteVote = async (
 
   return response.json() as Promise<VotesResponse>;
 };
+
+const VoteAPI = {
+  listVotes,
+  createVote,
+  deleteVote,
+};
+
+export default VoteAPI;

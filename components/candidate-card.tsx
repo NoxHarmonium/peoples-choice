@@ -87,7 +87,7 @@ export const CandidateCard = ({
     votes,
     votesRemaining,
     lastSuccessfulVote,
-  } = useTypedSelector(({ votesViewModel }) => votesViewModel);
+  } = useTypedSelector(({ votes }) => votes);
 
   const voteCount = votes.filter((v) => v === candidate.primaryEmail).length;
 
