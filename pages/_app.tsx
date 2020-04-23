@@ -3,7 +3,7 @@
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core/styles";
 import withRedux, { MakeStore, ReduxWrapperAppProps } from "next-redux-wrapper";
-import App, { AppContext } from "next/app";
+import App from "next/app";
 import Head from "next/head";
 import React from "react";
 import { Provider } from "react-redux";

@@ -12,6 +12,7 @@ export type ErrorResponse = {
   readonly error: string;
 };
 
+// eslint-disable-next-line @typescript-eslint/camelcase
 export type Candidate = admin_directory_v1.Schema$User;
 export type Candidates = ReadonlyArray<Candidate>;
 export type CandidatesResponse = {

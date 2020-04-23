@@ -5,7 +5,6 @@ import {
   CardContent,
   CardMedia,
   Grid,
-  Grow,
   IconButton,
   Snackbar,
   Typography,
@@ -100,7 +99,10 @@ export const CandidateCard = ({
   }, [lastSuccessfulVote, candidate]);
 
   const onPerformVote = useCallback(() => {
-    if (reward !== undefined) {
+    if (
+      reward !== undefined &&
+      !window.matchMedia("(prefers-reduced-motion)").matches
+    ) {
       reward.rewardMe();
     }
 
@@ -144,50 +146,48 @@ export const CandidateCard = ({
         }
       />
       <Grid item xs={12} md={3} key={index} className={classes.root}>
-        <Grow in={true}>
-          <Reward
-            ref={(ref) => {
-              setReward(ref);
-            }}
-            type="emoji"
-          >
-            <Card className={hasBeenVotedFor ? classes.voted : ""}>
-              <CardActionArea
-                className={classes.cardActionArea}
-                disabled={votingDisabled}
-                onClick={onPerformVote}
-              >
-                <CardMedia
-                  className={classes.media}
-                  image={
-                    candidate.thumbnailPhotoUrl ?? "/placeholder-portrait.png"
-                  }
-                  title={`Portrait of ${candidate.name.fullName}`}
-                />
-                <CardContent className={classes.content}>
-                  <Typography variant="h6" className={classes.nameTitle}>
-                    {candidate.name.fullName}
-                  </Typography>
-                  <Typography>
-                    {votesRemaining === 0
-                      ? "Thanks for voting"
-                      : voteCount > 0
-                      ? "Click to Vote again!"
-                      : "Click to Vote!"}
-                  </Typography>
-                  <div className={classes.thumbsPanel}>
-                    {Array.from({ length: voteCount }, (_, index) => (
-                      <span key={index}>
-                        <ThumbUpIcon />
-                        {"  "}
-                      </span>
-                    ))}
-                  </div>
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          </Reward>
-        </Grow>
+        <Reward
+          ref={(ref) => {
+            setReward(ref);
+          }}
+          type="emoji"
+        >
+          <Card className={hasBeenVotedFor ? classes.voted : ""}>
+            <CardActionArea
+              className={classes.cardActionArea}
+              disabled={votingDisabled}
+              onClick={onPerformVote}
+            >
+              <CardMedia
+                className={classes.media}
+                image={
+                  candidate.thumbnailPhotoUrl ?? "/placeholder-portrait.png"
+                }
+                title={`Portrait of ${candidate.name.fullName}`}
+              />
+              <CardContent className={classes.content}>
+                <Typography variant="h6" className={classes.nameTitle}>
+                  {candidate.name.fullName}
+                </Typography>
+                <Typography>
+                  {votesRemaining === 0
+                    ? "Thanks for voting"
+                    : voteCount > 0
+                    ? "Click to Vote again!"
+                    : "Click to Vote!"}
+                </Typography>
+                <div className={classes.thumbsPanel}>
+                  {Array.from({ length: voteCount }, (_, index) => (
+                    <span key={index}>
+                      <ThumbUpIcon />
+                      {"  "}
+                    </span>
+                  ))}
+                </div>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+        </Reward>
       </Grid>
     </>
   );

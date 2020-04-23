@@ -1,5 +1,6 @@
-import { env } from "./env";
 import { DynamoDB } from "aws-sdk";
+
+import { env } from "./env";
 
 const dynamoClient = new DynamoDB.DocumentClient({
   accessKeyId: env.AWS_ACCESS_KEY_ID_,

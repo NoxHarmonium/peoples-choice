@@ -6,7 +6,6 @@ import { JsonValue } from "type-fest";
 
 import { env } from "./env";
 import { makeOAuthClient } from "./oauth-client";
-import { obfusticateEmail } from "./obfusticate";
 import { ApiResponse } from "./types";
 
 export const apiHandler = <ResponseType = JsonValue>(
