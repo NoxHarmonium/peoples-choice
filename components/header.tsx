@@ -5,8 +5,11 @@ import { useTypedSelector } from "../state/store";
 
 const useStyles = makeStyles((theme) => ({
   title: {
-    fontSize: 24,
+    fontSize: 16,
     color: theme.palette.common.white,
+    [theme.breakpoints.up("sm")]: {
+      fontSize: 24,
+    },
   },
   toolbar: {
     justifyContent: "space-between",
@@ -17,6 +20,10 @@ const useStyles = makeStyles((theme) => ({
   },
   left: {
     flex: 1,
+    display: "none",
+    [theme.breakpoints.up("sm")]: {
+      display: "initial",
+    },
   },
   leftLinkActive: {
     color: theme.palette.common.white,

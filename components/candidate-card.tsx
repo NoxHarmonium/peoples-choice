@@ -101,6 +101,7 @@ export const CandidateCard = ({
   const onPerformVote = useCallback(() => {
     if (
       reward !== undefined &&
+      // Future work: maybe this should be part of the react-rewards CSS?
       !window.matchMedia("(prefers-reduced-motion)").matches
     ) {
       reward.rewardMe();
@@ -117,7 +118,6 @@ export const CandidateCard = ({
     setUndoShown(false);
   }, [setUndoShown]);
 
-  // TODO: Does the Grow animation still occur with reduce motion on?
   return (
     <>
       <Snackbar
