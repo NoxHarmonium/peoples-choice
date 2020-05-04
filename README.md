@@ -1,6 +1,6 @@
 ![peoples-choice logo](public/logo.png?raw=true "people's choice")
 
-[![Deploy to Vercel](https://vercel.com/button)](/import/project?template=https://github.com/noxharmonium/peoples-choice/tree/master/)
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/import/project?template=https://github.com/noxharmonium/peoples-choice/tree/master/)
 
 ## Summary
 
