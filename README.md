@@ -9,6 +9,14 @@ Feeling grateful? Want to recognise a colleague?
 People's Choice is a web application that
 lets people vote for their colleagues.
 
+### Features
+
+- 🎉 Confetti explosions when a vote is placed
+- 📱 Responsive layout
+- 🙈 Obfuscated vote records
+- ✅ Easy vote tallying and ranking
+- ☁️ Serverless ready
+
 ## Requirements
 
 ### G Suite
@@ -62,10 +70,9 @@ export API_CLIENT_ID="11111-xxxxx.apps.googleusercontent.com"
 export API_CLIENT_SECRET="some secret"
 export JWT_SECRET="some random secret"
 export DIRECTORY_DOMAIN="mycorp.com.au"
-export EXCLUDED_EMAILS="hello@mycorp.com.au"
-export ADMIN_EMAILS="elpresedente@mycorp.com.au"
+export EXCLUDED_EMAILS="hello@mycorp.com.au,support@mycorp.com.au"
+export ADMIN_EMAILS="elpresedente@mycorp.com.au,someother@mycorp.com.au"
 export MAX_VOTES="3"
-export WORKPLACE_NAME="My Corp"
 export OBFUSTICATION_PEPPER="QmAyxZJv6EM85EBW79aXPkt^N"
 
 export DYNAMO_USER_TABLE_NAME="PeoplesChoiceUserTable"
