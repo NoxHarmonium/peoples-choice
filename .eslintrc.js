@@ -12,6 +12,7 @@ module.exports = {
     "sonarjs",
     "functional",
     "simple-import-sort",
+    "total-functions",
   ],
   extends: [
     "eslint:recommended",
@@ -22,6 +23,7 @@ module.exports = {
     "plugin:functional/external-recommended",
     "plugin:functional/lite",
     "react-app",
+    "plugin:total-functions/recommended",
     "prettier",
   ],
   rules: {

@@ -61,6 +61,7 @@ function Typography(
       ) : (
         <span
           className={
+            // eslint-disable-next-line total-functions/no-array-subscript
             classes[
               `marked${capitalizeFirstChar(variant) +
                 capitalizeFirstChar(marked)}`
