@@ -30,6 +30,7 @@ const performVote = async (
     .promise();
 
   const totalVotes: number =
+    // eslint-disable-next-line total-functions/no-array-subscript
     userRecord.Item === undefined ? 0 : userRecord.Item["total_votes"];
 
   if (totalVotes >= env.MAX_VOTES) {
@@ -104,6 +105,7 @@ const removeVote = async (
     .promise();
 
   const totalVotes: number =
+    // eslint-disable-next-line total-functions/no-array-subscript
     userRecord.Item === undefined ? 0 : userRecord.Item["total_votes"];
 
   if (totalVotes <= 0) {

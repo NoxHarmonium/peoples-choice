@@ -26,6 +26,7 @@ const postReset = async (): Promise<ApiResponse<void>> => {
   await dynamoClient
     .batchWrite({
       RequestItems: {
+        // eslint-disable-next-line total-functions/no-array-destructuring
         [env.DYNAMO_USER_TABLE_NAME]: userRecords.Items.map(({ email }) => ({
           DeleteRequest: {
             Key: {

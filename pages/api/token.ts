@@ -31,6 +31,7 @@ export default apiHandler(async (req: NowRequest) => {
     }
 
     const oAuthClient = makeOAuthClient(req);
+    // eslint-disable-next-line total-functions/no-array-destructuring
     const { tokens } = await oAuthClient.getToken(req.query.code);
     return {
       statusCode: 302,
