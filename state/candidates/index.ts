@@ -11,6 +11,7 @@ const candidateApi = {
 
     checkResponse(response);
 
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     const json = await (response.json() as Promise<CandidatesResponse>);
 
     return {
