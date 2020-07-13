@@ -8,6 +8,7 @@ const listVotes = async (): Promise<VotesResponse> => {
 
   checkResponse(response);
 
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return response.json() as Promise<VotesResponse>;
 };
 
@@ -24,6 +25,7 @@ const createVote = async (targetEmail: string): Promise<VotesResponse> => {
 
   checkResponse(response);
 
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return response.json() as Promise<VotesResponse>;
 };
 
@@ -40,6 +42,7 @@ const deleteVote = async (targetEmail: string): Promise<VotesResponse> => {
 
   checkResponse(response);
 
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return response.json() as Promise<VotesResponse>;
 };
 
