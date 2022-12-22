@@ -23,7 +23,7 @@
     "flux-standard-action": "^2.1.1",
     "google-auth-library": "^5.10.1",
     "googleapis": "^48.0.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "knuth-shuffle": "^1.0.8",
     "lodash": "^4.17.21",
     "next": "^11.1.3",
